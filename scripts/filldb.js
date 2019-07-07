@@ -21,12 +21,14 @@ var reasons = [
     { reason: "advertising", value: 2 },
     { reason: "nsfw", value: 3 },
     { reason: "graphic", value: 4 },
+    { reason: "vulgar", value: 4 },
     { reason: "hatespeech", value: 4 },
+    { reason: "slurs", value: 4 },
     { reason: "illegal", value: 4 },
     { reason: "alt", value: 999 },
     { reason: "raid", value: 999 },
 
-    // Voice Channel
+    // Voice Channel Specific
     { reason: "vcspam", value: 1 },
     { reason: "vcnsfw", value: 3 },
 

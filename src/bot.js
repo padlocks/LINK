@@ -13,7 +13,7 @@ var day = date.getDate()
 var hour = date.getHours()
 var minute = date.getMinutes()
 var second = date.getSeconds()
-winston.add(winston.transports.File, { filename: `${__dirname}/logs/log-${year + month + day + hour + minute + second}.log` })
+//winston.add(winston.transports.File, { filename: `${__dirname}/logs/log-${year + month + day + hour + minute + second}.log` })
 
 var token = config.token
 

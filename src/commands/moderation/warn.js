@@ -42,6 +42,8 @@ module.exports = class WarnCommand extends Command {
             return
         }
 
+        reason = toLowerCase(reason) // fault tolerance
+
         let date = new Date()
         let day = date.toDateString()
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
