@@ -25,6 +25,7 @@ var reasons = [
     { reason: "hatespeech", value: 4 },
     { reason: "slurs", value: 4 },
     { reason: "illegal", value: 4 },
+    { reason: "illegalacts", value: 999 },
     { reason: "alt", value: 999 },
     { reason: "raid", value: 999 },
 
