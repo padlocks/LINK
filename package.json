@@ -1,0 +1,39 @@
+{
+  "name": "tc-auto-mod",
+  "version": "0.0.0",
+  "description": "",
+  "dependencies": {
+    "anyid": "^1.0.1",
+    "babel-eslint": "^8.1.2",
+    "better-sqlite3": "^5.4.0",
+    "chalk": "^2.0.1",
+    "cheerio": "^1.0.0-rc.2",
+    "discord.js": "^11.2.1",
+    "discord.js-commando": "^0.9.0",
+    "eslint": "^4.14.0",
+    "flatted": "^2.0.1",
+    "moment": "^2.24.0",
+    "moment-duration-format": "^1.3.0",
+    "q": "^1.5.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "serialijse": "^0.1.3",
+    "snekfetch": "^3.2.3",
+    "sqlite3": "^4.0.9",
+    "touch": "^3.1.0",
+    "trello": "^0.8.0",
+    "tsubaki": "^1.1.1",
+    "underscore": "^1.8.3",
+    "winston": "^2.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node ./src/bot.js",
+    "fill": "node ./scripts/filldb.js",
+    "init": "node ./scripts/initdb.js"
+  },
+  "author": "Pascal Young",
+  "private": true,
+  "main": "bot.js",
+  "repository": "https://gitlab.com/true-colors/automod.git"
+}
