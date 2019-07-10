@@ -2,19 +2,7 @@ var { FriendlyError, CommandoClient } = require('discord.js-commando')
 var { oneLine } = require('common-tags')
 var path = require('path')
 var winston = require('winston')
-
-var Moderation = require('./structures/Moderation')
 var config = require('./config.json')
-
-var date = new Date()
-var year = date.getYear()
-var month = date.getMonth()
-var day = date.getDate()
-var hour = date.getHours()
-var minute = date.getMinutes()
-var second = date.getSeconds()
-//winston.add(winston.transports.File, { filename: `${__dirname}/logs/log-${year + month + day + hour + minute + second}.log` })
-
 var token = config.token
 
 var client = new CommandoClient({
@@ -57,7 +45,7 @@ client.on('warn', winston.warn)
 
 client.registry
     .registerGroups([
-        //['general', 'General'],
+        ['general', 'General'],
         ['dev', 'Developer'],
         ['moderation', 'Moderation']
     ])
