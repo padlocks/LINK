@@ -1,4 +1,3 @@
-var winston = require('winston')
 var Database = require('better-sqlite3')
 var db = new Database('tc.db', { fileMustExist: true })
 

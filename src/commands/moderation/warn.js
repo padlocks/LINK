@@ -1,6 +1,6 @@
 var { Command } = require('discord.js-commando')
 var { RichEmbed } = require('discord.js')
-var winston = require('winston')
+var Logger = require('../../utils/Logger.js')
 var config = require('../../config.json')
 var Moderation = require('../../structures/Moderation')
 
@@ -72,7 +72,7 @@ module.exports = class WarnCommand extends Command {
                     })
                     .catch(err => {
                         embed.setFooter(`\u2717 ${datetime}`)
-                        winston.error(err)
+                        Logger.error(err)
                     })
                 sentMessage.edit(embed).then(() => {
                     return msg.react('\u2705')

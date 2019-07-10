@@ -1,5 +1,5 @@
 var { Command } = require('discord.js-commando')
-var winston = require('winston')
+var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
 
 module.exports = class AddEvidenceCommand extends Command {
@@ -36,6 +36,6 @@ module.exports = class AddEvidenceCommand extends Command {
 
         await Moderation.addEvidence(logId, evidence)
             .then(() => { return msg.react('\u2705') })
-            .catch(err => { winston.error(err) })
+            .catch(err => { Logger.error(err) })
     }
 }

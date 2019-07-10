@@ -1,6 +1,6 @@
 var { Command } = require('discord.js-commando')
 var { RichEmbed } = require('discord.js')
-var winston = require('winston')
+var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
 
 module.exports = class EvidenceCommand extends Command {
@@ -49,6 +49,6 @@ module.exports = class EvidenceCommand extends Command {
         embed.setFooter(`${datetime}`)
 
         return msg.channel.send(embed)
-            .catch(err => { winston.error(err) })
+            .catch(err => { Logger.error(err) })
     }
 }

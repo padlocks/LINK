@@ -1,7 +1,7 @@
 var { FriendlyError, CommandoClient } = require('discord.js-commando')
 var { oneLine } = require('common-tags')
 var path = require('path')
-var winston = require('winston')
+var Logger = require('./utils/Logger.js')
 var config = require('./config.json')
 var token = config.token
 
@@ -12,13 +12,13 @@ var client = new CommandoClient({
     disableEveryone: true
 })
 
-client.on('error', winston.error)
+client.on('error', Logger.error)
     .on('ready', () => {
-        winston.info(`[DISCORD]: client ready\nuser info: ${client.user.tag} id:${client.user.id}`)
+        Logger.info(`[DISCORD]: client ready\nuser info: ${client.user.tag} id:${client.user.id}`)
     })
-    .on('disconnect', () => winston.info('[DISCORD]: client disconnect'))
+    .on('disconnect', () => Logger.info('[DISCORD]: client disconnect'))
     .on('commandRun', (cmd, promise, msg, args) =>
-        winston.info(oneLine`
+        Logger.info(oneLine`
         [COMMAND]: ${msg.author.tag} (${msg.author.id})
         > ${cmd.groupID}:${cmd.memberName}
         ${Object.values(args).length ? `>> ${Object.values(args)}` : ''}
@@ -30,18 +30,18 @@ client.on('error', winston.error)
     })
     .on('commandError', (cmd, err) => {
         if (err instanceof FriendlyError) return
-        winston.error(`[COMMAND]: command error > ${cmd.groupID}:${cmd.memberName}`, err)
+        Logger.error(`[COMMAND]: command error > ${cmd.groupID}:${cmd.memberName}`, err)
     })
     .on('commandBlocked', (msg, reason) => {
-        winston.info(oneLine`
+        Logger.info(oneLine`
             [COMMAND]: command blocked
             > ${msg.command ? `${msg.command.groupID}:${msg.command.memberName}` : ''}
             User ${msg.author.tag} (${msg.author.id}): ${reason}
       `)
     })
 
-client.on('warn', winston.warn)
-    .on('reconnect', () => winston.warn('[DISCORD]: client reconnecting..'))
+client.on('warn', Logger.warn)
+    .on('reconnect', () => Logger.warn('[DISCORD]: client reconnecting..'))
 
 client.registry
     .registerGroups([

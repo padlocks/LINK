@@ -29,7 +29,6 @@ module.exports = class SetAvatarCommand extends Command {
 
     async run(msg, { imgURL }) {
         msg.author.client.user.setAvatar(imgURL)
-            .then(user => console.log('[DISCORD]: avatar set'))
             .then(() => msg.react('\u2705'))
             .catch(console.error)
     }
