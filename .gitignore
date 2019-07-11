@@ -2,6 +2,9 @@
 .idea/
 .vscode/
 
+# Database Files
+tc.db
+
 # Logs
 *.log
 npm-debug.log*
