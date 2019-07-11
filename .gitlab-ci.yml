@@ -1,0 +1,10 @@
+stages:
+  - deploy
+
+production:
+  stage: deploy
+  script:
+  - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/tc-auto-mod.git
+  - git push -fq heroku master || true
+  only:
+  - master
