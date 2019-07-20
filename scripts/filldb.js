@@ -17,6 +17,7 @@ var reasons = [
     { reason: "identityjoke", value: 1 },
     { reason: "impersonation", value: 2 },
     { reason: "rude", value: 2 },
+    { reason: "harassment", value: 2 },
     { reason: "od", value: 2 },
     { reason: "advertising", value: 2 },
     { reason: "nsfw", value: 3 },
@@ -36,6 +37,7 @@ var reasons = [
     // Direct Messages
     { reason: "dmadvertising", value: 2 },
     { reason: "dmrude", value: 3 },
+    { reason: "dmharassment", value: 3 },
     { reason: "dmhatespeech", value: 5 },
 ]
 

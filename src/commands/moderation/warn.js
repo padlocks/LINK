@@ -34,6 +34,7 @@ module.exports = class WarnCommand extends Command {
     }
 
     async run(msg, { member, reason }) {
+        // TODO: check to make sure i have perms
         if (!member) {
             return msg.reply('invalid user!')
         }
@@ -42,7 +43,7 @@ module.exports = class WarnCommand extends Command {
             return
         }
 
-        reason = toLowerCase(reason) // fault tolerance
+        reason = reason.toLowerCase() // fault tolerance
 
         let date = new Date()
         let day = date.toDateString()
@@ -52,30 +53,35 @@ module.exports = class WarnCommand extends Command {
         let datetime = `${day} @ ${time} (PST)`
 
         let logId = await Moderation.getIncompleteLogId() + 1
+        let logNum = await Moderation.getUserLogAmount(member.user.id) + 1
 
         let embed = new RichEmbed
-        embed.setAuthor(`Staff: ${msg.author.tag}`)
-        embed.setDescription(`See evidence using '!evidence ${logId}'`)
+        embed.setAuthor(`${member.user.tag} (${member.user.id}) | User Log #${logNum}`)
+        embed.setDescription(`See evidence using '!evidence ${logId}'\nAdd evidence using '!add' with an attachment.`)
         embed.setColor('#FF0000')
         embed.setTitle(`LogID: ${logId}`)
-        embed.addField('User', `${member.user.tag} (${member.user.id})`)
+        embed.addField('Staff', `${msg.author.tag}`)
         embed.addField('Reason', `${reason}`)
         embed.setFooter(`${datetime}`)
 
         member.guild.channels.get(config.log_channel).send(embed)
             .then(async (sentMessage) => {
                 await Moderation.addLog(sentMessage.id, member.user.tag, member.user.id, msg.author.tag, msg.author.id, reason)
-                    .then(async () => {
+                    .then(async (action) => {
                         let points = await Moderation.getPoints(member.user.id)
+                        embed.fields.push({ name: 'Resulting Action', value: `${action}` })
                         embed.fields.push({ name: 'Total User Points', value: `${points}` })
                         embed.setFooter(`\u2713 ${datetime}`)
+                        if (action == 'KICK') { member.kick(`Automatic kick by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`) }
+                        if (action == 'BAN') { member.ban(`Automatic ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`) }
+                        if (action == 'PERM_BAN') { member.ban(`Automatic perm ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`) }
                     })
                     .catch(err => {
                         embed.setFooter(`\u2717 ${datetime}`)
                         Logger.error(err)
                     })
                 sentMessage.edit(embed).then(() => {
-                    return msg.react('\u2705')
+                    msg.react('\u2705')
                 })
             })
             .catch(console.error)

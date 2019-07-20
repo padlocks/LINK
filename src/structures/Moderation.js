@@ -1,7 +1,14 @@
 var Database = require('better-sqlite3')
 var db = new Database('tc.db', { fileMustExist: true })
+var config = require('../config.json')
 
-class Moderation {
+module.exports = class Moderation {
+    //* Containter for all database calls related to 'moderation' commands.
+
+    /*
+     * Get Methods
+     */
+
     static async getIncompleteLogId() {
         db.aggregate('max', {
             start: 0,
@@ -13,49 +20,64 @@ class Moderation {
             }
         })
 
-        let logData = db.prepare(`SELECT max(rowid) FROM logs`).pluck().get()
-        return logData || 0
-    }
-
-    static async getPoints(userId) {
-        let userData = db.prepare(`SELECT points FROM users WHERE id='${userId}'`).pluck().get()
-        return userData || 0
+        return db.prepare('SELECT max(rowid) FROM logs').pluck().get() || 0
     }
 
     static async getReason(logId) {
-        let reasonData = db.prepare(`SELECT reason FROM logs WHERE rowid='${logId}'`).pluck().get()
-        return reasonData
-    }
-
-    static async getReasonValue(reason) {
-        let reasonData = db.prepare(`SELECT point_value FROM reasons WHERE reason='${reason}'`).pluck().get()
-        return reasonData
+        return db.prepare(`SELECT reason FROM logs WHERE rowid='${logId}'`).pluck().get()
     }
 
     static async getLogTime(logId) {
-        let logData = db.prepare(`SELECT time FROM logs WHERE rowid=${logId}`).pluck().get()
-        return logData
+        return db.prepare(`SELECT time FROM logs WHERE rowid=${logId}`).pluck().get()
     }
 
     static async getMessageId(logId) {
-        let logData = db.prepare(`SELECT log_message_id FROM logs WHERE rowid=${logId}`).pluck().get()
-        return logData
+        return db.prepare(`SELECT log_message_id FROM logs WHERE rowid=${logId}`).pluck().get()
     }
 
     static async getStaffResponsible(logId) {
         let username = db.prepare(`SELECT staff_username FROM logs WHERE rowid=${logId}`).pluck().get()
         let id = db.prepare(`SELECT staff_id FROM logs WHERE rowid=${logId}`).pluck().get()
 
-        let staff = `${username} (${id})`
-        return staff
+        return `${username} (${id})`
     }
 
     static async getUser(logId) {
         let username = db.prepare(`SELECT username FROM logs WHERE rowid=${logId}`).pluck().get()
         let id = db.prepare(`SELECT user_id FROM logs WHERE rowid=${logId}`).pluck().get()
 
-        let user = `${username} (${id})`
-        return user
+        return `${username} (${id})`
+    }
+    
+    static async getUserLogAmount(userId) {
+        let amount = 0
+        let data = db.prepare(`SELECT rowid FROM logs WHERE user_id=${userId}`).all()
+        data.forEach((elem) => { amount++ })
+        return amount
+    }
+
+    static async getAction(logId) {
+        return db.prepare(`SELECT action FROM logs WHERE rowid=${logId}`).pluck().get()
+    }
+
+    static async getPoints(userId) {
+        return db.prepare(`SELECT points FROM users WHERE id='${userId}'`).pluck().get() || 0
+    }
+
+    static async getWarnings(userId) {
+        return db.prepare(`SELECT warnings FROM users WHERE id='${userId}'`).pluck().get() || 0
+    }
+
+    static async getKicks(userId) {
+        return db.prepare(`SELECT kicks FROM users WHERE id='${userId}'`).pluck().get() || 0
+    }
+
+    static async getBans(userId) {
+        return db.prepare(`SELECT bans FROM users WHERE id='${userId}'`).pluck().get() || 0
+    }
+
+    static async getReasonValue(reason) {
+        return db.prepare(`SELECT point_value FROM reasons WHERE reason='${reason}'`).pluck().get()
     }
 
     static async getEvidenceString(logId) {
@@ -67,11 +89,13 @@ class Moderation {
         return evidenceString
     }
 
-
+    /*
+     * Set Methods
+     */
     static async addPoints(userId, username, reason) {
         let userData = db.prepare(`SELECT * FROM users WHERE id='${userId}'`).pluck().get()
         if (!userData) {
-            db.prepare(`INSERT INTO users VALUES(${userId}, '${username}', 0)`).run()
+            db.prepare(`INSERT INTO users VALUES(${userId}, '${username}', 0, 0, 0, 0)`).run()
         }
 
         let userPoints = await this.getPoints(userId)
@@ -88,8 +112,30 @@ class Moderation {
         let time = `${hours}:${minutes}`
         let datetime = `${day} @ ${time} (PST)`
 
-        db.prepare(`INSERT INTO logs VALUES('${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}')`).run()
         await this.addPoints(userId, username, reason)
+
+        let action = await this.calculateAction(await this.getPoints(userId), await this.getWarnings(userId), await this.getKicks(userId), await this.getBans(userId))
+
+        if (action == 'WARNING') { 
+            db.prepare(`UPDATE users SET warnings = ${await this.getWarnings(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO warnings VALUES(${userId}, '${username}', '${datetime})`).run()
+        }
+        if (action == 'KICK') { 
+            db.prepare(`UPDATE users SET kicks = ${await this.getKicks(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO kicks VALUES(${userId}, '${username}', '${datetime})`).run()
+        }
+        if (action == 'BAN') { 
+            db.prepare(`UPDATE users SET bans = ${await this.getBans(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO bans VALUES(${userId}, '${username}', '${datetime})`).run()
+        }
+        if (action == 'PERM_BAN') { 
+            db.prepare(`UPDATE users SET bans = ${await this.getBans(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO perm_bans VALUES(${userId}, '${username}', '${datetime})`).run()
+        }
+        
+        db.prepare(`INSERT INTO logs VALUES('${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}')`).run()
+
+        return action
     }
 
     static async addEvidence(logId, evidenceURL) {
@@ -112,6 +158,95 @@ class Moderation {
         let datetime = `${day} @ ${time} (PST)`
         db.prepare(`INSERT INTO comments(id, time, staff, staff_id, comment) VALUES(${logId}, '${datetime}', '${staffUsername}', '${staffId}', '${comment}')`).run()
     }
-}
 
-module.exports = Moderation
+    static async calculateAction(points, warnings, kicks, bans) {
+        /*
+         * BEWARE: Spaghetti Code ahead!
+         * Possible scenarios
+         * 
+         * <6 points, 0 warn, 0 kicks, 0 bans -> warning
+         * >6 points, 0 warn, 0 kicks, 0 bans -> kick
+         * <6 points, 1 warn, 0 kicks, 0 bans -> warning
+         * >6 points, 1 warn, 0 kicks, 0 bans -> kick
+         * X points, 2 warn, 0 kicks, 0 bans -> kick
+         * 
+         * <10 points, 2 warn, 1 kicks, 0 bans -> warning
+         * >10 points, 2 warn, 1 kicks, 0 bans -> ban
+         * <10 points, 3 warn, 1 kicks, 0 bans -> warning
+         * >10 points, 3 warn, 1 kicks, 0 bans -> ban
+         * X points, 4 warn, 1 kicks, 0 bans -> ban
+         * 
+         * appealed
+         * 
+         * <16 points, 4 warn, 1 kicks, 1 bans -> warning
+         * >16 points, 4 warn, 1 kicks, 1 bans -> kick
+         * <16 points, 5 warn, 1 kicks, 1 bans -> warning
+         * >16 points, 5 warn, 1 kicks, 1 bans -> kick
+         * X points, 6 warn, 1 kicks, 1 bans -> kick
+         * 
+         * <22 points, 6 warn, 2 kicks, 1 bans -> warning
+         * >22 points, 6 warn, 2 kicks, 1 bans -> ban
+         * <22 points, 7 warn, 2 kicks, 1 bans -> warning
+         * >22 points, 7 warn, 2 kicks, 1 bans -> ban
+         * X points, 8 warn, 2 kicks, 1 bans -> ban
+         * 
+         * appealed
+         * 
+         * <28 points, 8 warn, 2 kicks, 2 bans -> warning
+         * >28 points, 8 warn, 2 kicks, 2 bans -> kick
+         * <28 points, 9 warn, 2 kicks, 2 bans -> warning
+         * >28 points, 9 warn, 2 kicks, 2 bans -> kick
+         * X points, 10 warn, 2 kicks, 2 bans -> kick
+         * 
+         * <34 points, 10 warn, 3 kicks, 2 bans -> warning
+         * >34 points, 10 warn, 3 kicks, 2 bans -> perm ban
+         * <34 points, 11 warn, 3 kicks, 2 bans -> warning
+         * >34 points, 11 warn, 3 kicks, 2 bans -> perm ban
+         * X points, 12 warn, 3 kicks, 2 bans -> perm ban
+         * 
+         * It should be easier to read if we had each possibility as it's own if statement.
+        */
+
+        if (points < config.lowKick1Points && warnings == 0 && kicks == 0 && bans == 0) { return 'WARNING'}
+        if (points < config.lowKick1Points && warnings == 1 && kicks == 0 && bans == 0) { return 'WARNING'}
+        if (points > config.lowKick1Points && warnings == 0 && kicks == 0 && bans == 0) { return 'KICK'}
+        if (points > config.lowKick1Points && warnings == 1 && kicks == 0 && bans == 0) { return 'KICK'}
+        if (warnings == 2 && kicks == 0 && bans == 0) { return 'KICK'}
+
+        if (points < config.lowBan1Points && warnings == 1 && kicks == 1 && bans == 0) { return 'WARNING'}
+        if (points < config.lowBan1Points && warnings == 2 && kicks == 1 && bans == 0) { return 'WARNING'}
+        if (points < config.lowBan1Points && warnings == 3 && kicks == 1 && bans == 0) { return 'WARNING'}
+        if (points > config.lowBan1Points && warnings == 2 && kicks == 1 && bans == 0) { return 'BAN'}
+        if (points > config.lowBan1Points && warnings == 3 && kicks == 1 && bans == 0) { return 'BAN'}
+        if (warnings == 3 && kicks == 1 && bans == 0) { return 'BAN'}
+
+        if (points < config.lowKick2Points && warnings == 1 && kicks == 1 && bans == 1) { return 'WARNING'}
+        if (points < config.lowKick2Points && warnings == 2 && kicks == 1 && bans == 1) { return 'WARNING'}
+        if (points < config.lowKick2Points && warnings == 3 && kicks == 1 && bans == 1) { return 'WARNING'}
+        if (points < config.lowKick2Points && warnings == 4 && kicks == 1 && bans == 1) { return 'WARNING'}
+        if (points < config.lowKick2Points && warnings == 5 && kicks == 1 && bans == 1) { return 'WARNING'}
+        if (points > config.lowKick2Points && warnings == 4 && kicks == 1 && bans == 1) { return 'KICK'}
+        if (points > config.lowKick2Points && warnings == 5 && kicks == 1 && bans == 1) { return 'KICK'}
+        if (warnings == 5 && kicks == 1 && bans == 1) { return 'KICK'}
+
+        if (points < config.lowBan2Points && warnings == 6 && kicks == 2 && bans == 1) { return 'WARNING'}
+        if (points < config.lowBan2Points && warnings == 7 && kicks == 2 && bans == 1) { return 'WARNING'}
+        if (points > config.lowBan2Points && warnings == 6 && kicks == 2 && bans == 1) { return 'BAN'}
+        if (points > config.lowBan2Points && warnings == 7 && kicks == 2 && bans == 1) { return 'BAN'}
+        if (warnings == 7 && kicks == 2 && bans == 1) { return 'BAN'}
+
+        if (points < config.lowKick3Points && warnings == 8 && kicks == 2 && bans == 2) { return 'WARNING'}
+        if (points < config.lowKick3Points && warnings == 9 && kicks == 2 && bans == 2) { return 'WARNING'}
+        if (points > config.lowKick3Points && warnings == 8 && kicks == 2 && bans == 2) { return 'KICK'}
+        if (points > config.lowKick3Points && warnings == 9 && kicks == 2 && bans == 2) { return 'KICK'}
+        if (warnings == 9 && kicks == 2 && bans == 2) { return 'KICK'}
+
+        if (points < config.lowPermPoints && warnings == 10 && kicks == 3 && bans == 2) { return 'WARNING'}
+        if (points < config.lowPermPoints && warnings == 11 && kicks == 3 && bans == 2) { return 'WARNING'}
+        if (points > config.lowPermPoints && warnings == 10 && kicks == 3 && bans == 2) { return 'PERM_BAN'}
+        if (points > config.lowPermPoints && warnings == 11 && kicks == 3 && bans == 2) { return 'PERM_BAN'}
+        if (warnings == 11 && kicks == 3 && bans == 2) { return 'PERM_BAN'}
+        //TODO: fault tolerance and make it less specific (not && every && frickin && thing)
+
+    }
+}
