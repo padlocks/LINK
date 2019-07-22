@@ -42,8 +42,14 @@ module.exports = class WarnCommand extends Command {
         if (!msg.guild.me.hasPermission('BAN_MEMBERS')) perms.push('BAN_MEMBERS')
 
         if (perms.length > 0) return msg.reply(`I require the additional following permissions to use this command: ${perms}`)
-        if (!member) return msg.reply('invalid user!')
-        if (member === msg.member) return
+        if (!member) {
+            msg.react('\u2612')
+            return msg.reply('invalid user!')
+        }
+        if (member === msg.member) {
+            msg.react('\u2612')
+            return msg.reply('you cannot warn yourself!')
+        }
 
         reason = reason.toLowerCase() // fault tolerance
 

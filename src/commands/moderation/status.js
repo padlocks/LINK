@@ -7,7 +7,7 @@ module.exports = class StatusCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'status',
-            aliases: ['status'],
+            aliases: ['status', 'logs'],
             group: 'moderation',
             memberName: 'status',
             description: 'Returns the moderation status of a user.',
@@ -56,6 +56,7 @@ module.exports = class StatusCommand extends Command {
 
         embed.setDescription(stripIndents`
             **User Stats**
+            User: <@${member.user.id}>
             Warns: ${warnings}
             Kicks: ${kicks}
             Bans: ${bans}
@@ -64,9 +65,9 @@ module.exports = class StatusCommand extends Command {
 
             ${paginated.items.map(log => `
                 **User Log #${log['user_log_num']} (ID: ${log['id']})**:
-                Reason: ${log['reason']}
-                Action: ${log['action']}
-                Staff: ${log['staff_username']} ${log['staff_id']}
+                Reason: **${log['reason']}**
+                Action: **${log['action']}**
+                Staff: <@${log['staff_id']}>
                 Time: ${log['time']}
             `).join('\n')}
         `)
