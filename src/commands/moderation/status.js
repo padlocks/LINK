@@ -1,5 +1,5 @@
 var { Command, util } = require('discord.js-commando')
-var { oneLine, stripIndents } = require('common-tags')
+var { stripIndents } = require('common-tags')
 var { RichEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')

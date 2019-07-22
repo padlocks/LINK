@@ -63,7 +63,7 @@ module.exports = class Moderation {
     
     static async getTotalUserLogAmount(userId) {
         let amount = 0
-        let data = db.prepare(`SELECT rowid FROM logs WHERE user_id=${userId}`).all()
+        let data = db.prepare(`SELECT id FROM logs WHERE user_id=${userId}`).all()
         data.forEach((elem) => { amount++ })
         return amount
     }
@@ -107,6 +107,10 @@ module.exports = class Moderation {
             evidenceString = evidenceString + `<${elem['evidence_url']}>` + '\n'
         })
         return evidenceString
+    }
+
+    static async getAllUserEvidence(userId) {
+        return db.prepare(`SELECT * FROM evidence WHERE user=${userId}`).all()
     }
 
     static async getAllComments(logId) {
@@ -174,9 +178,11 @@ module.exports = class Moderation {
         let time = `${hours}:${minutes}`
         let datetime = `${day} @ ${time} (PST)`
 
-        let user = this.getUserId(logId)
+        let user = await this.getUserId(logId)
+        let userLogNum = await this.getTotalUserLogAmount(user)
+        let reason = await this.getReason(logId)
 
-        db.prepare(`INSERT INTO evidence(id, time, evidence_url) VALUES(${logId}, '${datetime}', '${evidenceURL}', '${user}')`).run()
+        db.prepare(`INSERT INTO evidence(id, user_log_num, reason, time, evidence_url, user) VALUES(${logId}, ${userLogNum}, '${reason}', '${datetime}', '${evidenceURL}', '${user}')`).run()
     }
 
     static async addComment(logId, staffUsername, staffId, comment) {
