@@ -1,6 +1,7 @@
 var { Command } = require('discord.js-commando')
 var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
+var urlChecker = require('../../utils/urlChecker')
 
 module.exports = class AddEvidenceCommand extends Command {
     constructor(client) {
@@ -17,6 +18,12 @@ module.exports = class AddEvidenceCommand extends Command {
                     key: 'logId',
                     prompt: 'What is the log (id) you want to add evidence to?\n',
                     type: 'integer'
+                },
+                {
+                    key: 'url',
+                    prompt: 'What link would you like to upload as evidence?\n',
+                    default: 'NONE',
+                    type: 'string'
                 }
             ]
         })
@@ -26,14 +33,23 @@ module.exports = class AddEvidenceCommand extends Command {
         return msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
-    async run(msg, { logId }) {
-        // TODO: allow links to be passed through. confirm it's a resolvable link.
-
+    async run(msg, { logId, url }) {
+        // TODO: url from string is stored as undefined in the database
         let evidence
-        if (msg.attachments.first()) {
-            evidence = msg.attachments.first().url
+
+        // check if evidence is a url or an attachment..
+        if (url == 'NONE') {
+            if (msg.attachments.first()) {
+                evidence = msg.attachments.first().url
+            } else {
+                return msg.channel.send('No evidence supplied.')
+            }
+            
         } else {
-            return msg.channel.send('No evidence supplied.')
+            urlChecker.verify(url, () => {
+                console.log(typeof url)
+                evidence = url.toString()
+            })
         }
 
         await Moderation.addEvidence(logId, evidence)

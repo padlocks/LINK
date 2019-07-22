@@ -118,19 +118,19 @@ module.exports = class Moderation {
 
         if (action == 'WARNING' || action == 'WARNING_PERM_NEXT') { 
             db.prepare(`UPDATE users SET warnings = ${await this.getWarnings(userId) + 1} WHERE id = '${userId}'`).run()
-            db.prepare(`INSERT INTO warnings VALUES(${userId}, '${username}', '${datetime})`).run()
+            db.prepare(`INSERT INTO warnings VALUES(${userId}, '${username}', '${datetime}')`).run()
         }
         if (action == 'KICK') { 
             db.prepare(`UPDATE users SET kicks = ${await this.getKicks(userId) + 1} WHERE id = '${userId}'`).run()
-            db.prepare(`INSERT INTO kicks VALUES(${userId}, '${username}', '${datetime})`).run()
+            db.prepare(`INSERT INTO kicks VALUES(${userId}, '${username}', '${datetime}')`).run()
         }
         if (action == 'BAN') { 
             db.prepare(`UPDATE users SET bans = ${await this.getBans(userId) + 1} WHERE id = '${userId}'`).run()
-            db.prepare(`INSERT INTO bans VALUES(${userId}, '${username}', '${datetime})`).run()
+            db.prepare(`INSERT INTO bans VALUES(${userId}, '${username}', '${datetime}')`).run()
         }
         if (action == 'PERM_BAN') { 
             db.prepare(`UPDATE users SET bans = ${await this.getBans(userId) + 1} WHERE id = '${userId}'`).run()
-            db.prepare(`INSERT INTO perm_bans VALUES(${userId}, '${username}', '${datetime})`).run()
+            db.prepare(`INSERT INTO perm_bans VALUES(${userId}, '${username}', '${datetime}')`).run()
         }
         
         db.prepare(`INSERT INTO logs VALUES('${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}')`).run()

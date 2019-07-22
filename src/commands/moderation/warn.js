@@ -34,14 +34,16 @@ module.exports = class WarnCommand extends Command {
     }
 
     async run(msg, { member, reason }) {
-        // TODO: check to make sure i have perms
-        if (!member) {
-            return msg.reply('invalid user!')
-        }
 
-        if (member === msg.member) {
-            return
-        }
+        // confirm bot has proper permissions...
+        let perms = []
+        if (!msg.guild.me.hasPermission('MANAGE_MESSAGES')) perms.push('MANAGE_MESSAGES')
+        if (!msg.guild.me.hasPermission('KICK_MEMBERS')) perms.push('KICK_MEMBERS')
+        if (!msg.guild.me.hasPermission('BAN_MEMBERS')) perms.push('BAN_MEMBERS')
+
+        if (perms.length > 0) return msg.reply(`I require the additional following permissions to use this command: ${perms}`)
+        if (!member) return msg.reply('invalid user!')
+        if (member === msg.member) return
 
         reason = reason.toLowerCase() // fault tolerance
 
@@ -72,9 +74,24 @@ module.exports = class WarnCommand extends Command {
                         embed.fields.push({ name: 'Resulting Action', value: `${action}` })
                         embed.fields.push({ name: 'Total User Points', value: `${points}` })
                         embed.setFooter(`\u2713 ${datetime}`)
-                        if (action == 'KICK') { member.kick(`Automatic kick by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`) }
-                        if (action == 'BAN') { member.ban(`Automatic ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`) }
-                        if (action == 'PERM_BAN') { member.ban(`Automatic perm ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`) }
+                        if (action == 'WARNING') { 
+                            member.send(`You have received a warning for \`${reason}\`. Please be more mindful next time.\nRules can be found here: <#${config.rules_channel}>\n\n- True Colors Administration`)
+                        }
+                        if (action == 'WARNING_PERM_NEXT') {
+                            member.send(`You have received a warning for \`${reason}\`. Please be more mindful next time. **You are due for a permanent ban soon.**\nRules can be found here: <#${config.rules_channel}>\n\n- True Colors Administration`)
+                        }
+                        if (action == 'KICK') { 
+                            member.send(`You have been kicked for \`${reason}\`. Please be more mindful next time.\nRules can be found here: <#${config.rules_channel}>\n\n- True Colors Administration`)
+                            member.kick(`Automatic kick by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                        }
+                        if (action == 'BAN') { 
+                            member.send(`You have been banned for \`${reason}\`. [appeal info]\n\n- True Colors Administration`)
+                            member.ban(`Automatic ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                        }
+                        if (action == 'PERM_BAN') { 
+                            member.send(`Due to a severe rule violations or recurring violations, you have been **permenately** banned for \`${reason}\`.\n\n- True Colors Administration`)
+                            member.ban(`Automatic perm ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                        }
                     })
                     .catch(err => {
                         embed.setFooter(`\u2717 ${datetime}`)
