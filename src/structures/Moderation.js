@@ -72,6 +72,10 @@ module.exports = class Moderation {
         return db.prepare(`SELECT user_log_num FROM logs WHERE user_id=${userId}`).pluck().get() || 0
     }
 
+    static async getUserLogs(userId) {
+        return db.prepare(`SELECT * FROM logs WHERE user_id=${userId}`).all()
+    }
+
     static async getAction(logId) {
         return db.prepare(`SELECT action FROM logs WHERE rowid=${logId}`).pluck().get()
     }
@@ -137,6 +141,7 @@ module.exports = class Moderation {
 
         let action = await this.calculateAction(await this.getPoints(userId), await this.getWarnings(userId), await this.getKicks(userId), await this.getBans(userId))
         let userLogNum = await this.getTotalUserLogAmount(userId) + 1
+        let logId = await this.getIncompleteLogId() + 1
 
         if (action == 'WARNING' || action == 'WARNING_PERM_NEXT') { 
             db.prepare(`UPDATE users SET warnings = ${await this.getWarnings(userId) + 1} WHERE id = '${userId}'`).run()
@@ -155,7 +160,7 @@ module.exports = class Moderation {
             db.prepare(`INSERT INTO perm_bans VALUES(${userId}, '${username}', '${datetime}')`).run()
         }
         
-        db.prepare(`INSERT INTO logs VALUES('${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
+        db.prepare(`INSERT INTO logs VALUES(${logId}, '${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
         db.prepare(`UPDATE users SET logs = ${userLogNum}`).run()
 
         return action
@@ -169,7 +174,9 @@ module.exports = class Moderation {
         let time = `${hours}:${minutes}`
         let datetime = `${day} @ ${time} (PST)`
 
-        db.prepare(`INSERT INTO evidence(id, time, evidence_url) VALUES(${logId}, '${datetime}', '${evidenceURL}')`).run()
+        let user = this.getUserId(logId)
+
+        db.prepare(`INSERT INTO evidence(id, time, evidence_url) VALUES(${logId}, '${datetime}', '${evidenceURL}', '${user}')`).run()
     }
 
     static async addComment(logId, staffUsername, staffId, comment) {
@@ -235,27 +242,27 @@ module.exports = class Moderation {
 
         // First kick
         if (points < config.lowKick1Points && warnings < 2) return 'WARNING'
-        if ((points > config.lowKick1Points && points < lowBan1Points) || warnings == 2) return 'KICK'
+        if ((points > config.lowKick1Points && points < config.lowBan1Points) || (warnings == 2)) return 'KICK'
 
         // First ban
         if (points < config.lowBan1Points && warnings < 3) return 'WARNING'
-        if ((points > config.lowBan1Points && points < lowKick2Points) || (warnings == 3 && kicks == 1)) return 'BAN'
+        if ((points > config.lowBan1Points && points < config.lowKick2Points) || (warnings == 3 && kicks == 1)) return 'BAN'
 
         // Second kick
         if (points < config.lowKick2Points && warnings < 5) return 'WARNING'
-        if ((points > config.lowKick2Points && points < lowBan2Points) || (warnings == 5 && kicks == 1 && bans == 1)) return 'KICK'
+        if ((points > config.lowKick2Points && points < config.lowBan2Points) || (warnings == 5 && kicks == 1 && bans == 1)) return 'KICK'
 
         // Second ban
         if (points < config.lowBan2Points && warnings < 7) return 'WARNING'
-        if ((points > config.lowBan2Points && points < lowKick3Points) || (warnings == 7 && kicks == 2 && bans == 1)) return 'BAN'
+        if ((points > config.lowBan2Points && points < config.lowKick3Points) || (warnings == 7 && kicks == 2 && bans == 1)) return 'BAN'
 
         // Third kick
         if (points < config.lowKick3Points && warnings < 9) return 'WARNING'
-        if ((points > config.lowKick3Points && points < lowPermPoints) || (warnings == 9 && kicks == 2 && bans == 2)) return 'KICK'
+        if ((points > config.lowKick3Points && points < config.lowPermPoints) || (warnings == 9 && kicks == 2 && bans == 2)) return 'KICK'
 
         // Perm ban
         if (points < config.lowPermPoints && warnings < 11) return 'WARNING_PERM_NEXT'
-        if ((points >= lowPermPoints) || (warnings == 11 && kicks == 3 && bans == 2)) return 'PERM_BAN'
+        if ((points >= config.lowPermPoints) || (warnings == 11 && kicks == 3 && bans == 2)) return 'PERM_BAN'
 
     }
 }
