@@ -116,7 +116,7 @@ module.exports = class Moderation {
 
         let action = await this.calculateAction(await this.getPoints(userId), await this.getWarnings(userId), await this.getKicks(userId), await this.getBans(userId))
 
-        if (action == 'WARNING') { 
+        if (action == 'WARNING' || action == 'WARNING_PERM_NEXT') { 
             db.prepare(`UPDATE users SET warnings = ${await this.getWarnings(userId) + 1} WHERE id = '${userId}'`).run()
             db.prepare(`INSERT INTO warnings VALUES(${userId}, '${username}', '${datetime})`).run()
         }
@@ -207,46 +207,32 @@ module.exports = class Moderation {
          * It should be easier to read if we had each possibility as it's own if statement.
         */
 
-        if (points < config.lowKick1Points && warnings == 0 && kicks == 0 && bans == 0) { return 'WARNING'}
-        if (points < config.lowKick1Points && warnings == 1 && kicks == 0 && bans == 0) { return 'WARNING'}
-        if (points > config.lowKick1Points && warnings == 0 && kicks == 0 && bans == 0) { return 'KICK'}
-        if (points > config.lowKick1Points && warnings == 1 && kicks == 0 && bans == 0) { return 'KICK'}
-        if (warnings == 2 && kicks == 0 && bans == 0) { return 'KICK'}
+        // User's violation is severe, perm ban.
+        if (points >= 999) return 'PERM_BAN'
 
-        if (points < config.lowBan1Points && warnings == 1 && kicks == 1 && bans == 0) { return 'WARNING'}
-        if (points < config.lowBan1Points && warnings == 2 && kicks == 1 && bans == 0) { return 'WARNING'}
-        if (points < config.lowBan1Points && warnings == 3 && kicks == 1 && bans == 0) { return 'WARNING'}
-        if (points > config.lowBan1Points && warnings == 2 && kicks == 1 && bans == 0) { return 'BAN'}
-        if (points > config.lowBan1Points && warnings == 3 && kicks == 1 && bans == 0) { return 'BAN'}
-        if (warnings == 3 && kicks == 1 && bans == 0) { return 'BAN'}
+        // First kick
+        if (points < config.lowKick1Points && warnings < 2) return 'WARNING'
+        if ((points > config.lowKick1Points && points < lowBan1Points) || warnings == 2) return 'KICK'
 
-        if (points < config.lowKick2Points && warnings == 1 && kicks == 1 && bans == 1) { return 'WARNING'}
-        if (points < config.lowKick2Points && warnings == 2 && kicks == 1 && bans == 1) { return 'WARNING'}
-        if (points < config.lowKick2Points && warnings == 3 && kicks == 1 && bans == 1) { return 'WARNING'}
-        if (points < config.lowKick2Points && warnings == 4 && kicks == 1 && bans == 1) { return 'WARNING'}
-        if (points < config.lowKick2Points && warnings == 5 && kicks == 1 && bans == 1) { return 'WARNING'}
-        if (points > config.lowKick2Points && warnings == 4 && kicks == 1 && bans == 1) { return 'KICK'}
-        if (points > config.lowKick2Points && warnings == 5 && kicks == 1 && bans == 1) { return 'KICK'}
-        if (warnings == 5 && kicks == 1 && bans == 1) { return 'KICK'}
+        // First ban
+        if (points < config.lowBan1Points && warnings < 3) return 'WARNING'
+        if ((points > config.lowBan1Points && points < lowKick2Points) || (warnings == 3 && kicks == 1)) return 'BAN'
 
-        if (points < config.lowBan2Points && warnings == 6 && kicks == 2 && bans == 1) { return 'WARNING'}
-        if (points < config.lowBan2Points && warnings == 7 && kicks == 2 && bans == 1) { return 'WARNING'}
-        if (points > config.lowBan2Points && warnings == 6 && kicks == 2 && bans == 1) { return 'BAN'}
-        if (points > config.lowBan2Points && warnings == 7 && kicks == 2 && bans == 1) { return 'BAN'}
-        if (warnings == 7 && kicks == 2 && bans == 1) { return 'BAN'}
+        // Second kick
+        if (points < config.lowKick2Points && warnings < 5) return 'WARNING'
+        if ((points > config.lowKick2Points && points < lowBan2Points) || (warnings == 5 && kicks == 1 && bans == 1)) return 'KICK'
 
-        if (points < config.lowKick3Points && warnings == 8 && kicks == 2 && bans == 2) { return 'WARNING'}
-        if (points < config.lowKick3Points && warnings == 9 && kicks == 2 && bans == 2) { return 'WARNING'}
-        if (points > config.lowKick3Points && warnings == 8 && kicks == 2 && bans == 2) { return 'KICK'}
-        if (points > config.lowKick3Points && warnings == 9 && kicks == 2 && bans == 2) { return 'KICK'}
-        if (warnings == 9 && kicks == 2 && bans == 2) { return 'KICK'}
+        // Second ban
+        if (points < config.lowBan2Points && warnings < 7) return 'WARNING'
+        if ((points > config.lowBan2Points && points < lowKick3Points) || (warnings == 7 && kicks == 2 && bans == 1)) return 'BAN'
 
-        if (points < config.lowPermPoints && warnings == 10 && kicks == 3 && bans == 2) { return 'WARNING'}
-        if (points < config.lowPermPoints && warnings == 11 && kicks == 3 && bans == 2) { return 'WARNING'}
-        if (points > config.lowPermPoints && warnings == 10 && kicks == 3 && bans == 2) { return 'PERM_BAN'}
-        if (points > config.lowPermPoints && warnings == 11 && kicks == 3 && bans == 2) { return 'PERM_BAN'}
-        if (warnings == 11 && kicks == 3 && bans == 2) { return 'PERM_BAN'}
-        //TODO: fault tolerance and make it less specific (not && every && frickin && thing)
+        // Third kick
+        if (points < config.lowKick3Points && warnings < 9) return 'WARNING'
+        if ((points > config.lowKick3Points && points < lowPermPoints) || (warnings == 9 && kicks == 2 && bans == 2)) return 'KICK'
+
+        // Perm ban
+        if (points < config.lowPermPoints && warnings < 11) return 'WARNING_PERM_NEXT'
+        if ((points >= lowPermPoints) || (warnings == 11 && kicks == 3 && bans == 2)) return 'PERM_BAN'
 
     }
 }

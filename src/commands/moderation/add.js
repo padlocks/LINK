@@ -27,6 +27,8 @@ module.exports = class AddEvidenceCommand extends Command {
     }
 
     async run(msg, { logId }) {
+        // TODO: allow links to be passed through. confirm it's a resolvable link.
+
         let evidence
         if (msg.attachments.first()) {
             evidence = msg.attachments.first().url
