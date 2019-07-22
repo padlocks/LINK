@@ -16,7 +16,7 @@ module.exports = class EvidenceCommand extends Command {
             args: [
                 {
                     key: 'logId',
-                    prompt: 'What is the log (id) you want to add evidence to?\n',
+                    prompt: 'What is the log (id) you want to view evidence for?\n',
                     type: 'integer'
                 }
             ]

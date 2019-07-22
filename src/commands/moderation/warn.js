@@ -55,7 +55,7 @@ module.exports = class WarnCommand extends Command {
         let datetime = `${day} @ ${time} (PST)`
 
         let logId = await Moderation.getIncompleteLogId() + 1
-        let logNum = await Moderation.getUserLogAmount(member.user.id) + 1
+        let logNum = await Moderation.getTotalUserLogAmount(member.user.id) + 1
 
         let embed = new RichEmbed
         embed.setAuthor(`${member.user.tag} (${member.user.id}) | User Log #${logNum}`)
@@ -75,22 +75,32 @@ module.exports = class WarnCommand extends Command {
                         embed.fields.push({ name: 'Total User Points', value: `${points}` })
                         embed.setFooter(`\u2713 ${datetime}`)
                         if (action == 'WARNING') { 
-                            member.send(`You have received a warning for \`${reason}\`. Please be more mindful next time.\nRules can be found here: <#${config.rules_channel}>\n\n- True Colors Administration`)
+                            if (!member.user.bot) {
+                                member.send(`You have received a warning for \`${reason}\`. Please be more mindful next time.\nRules can be found here: <#${config.rules_channel}>\n\n- True Colors Administration`)
+                            }
                         }
                         if (action == 'WARNING_PERM_NEXT') {
-                            member.send(`You have received a warning for \`${reason}\`. Please be more mindful next time. **You are due for a permanent ban soon.**\nRules can be found here: <#${config.rules_channel}>\n\n- True Colors Administration`)
+                            if (!member.user.bot) {
+                                member.send(`You have received a warning for \`${reason}\`. Please be more mindful next time. **You are due for a permanent ban soon.**\nRules can be found here: <#${config.rules_channel}>\n\n- True Colors Administration`)
+                            }
                         }
-                        if (action == 'KICK') { 
-                            member.send(`You have been kicked for \`${reason}\`. Please be more mindful next time.\nRules can be found here: <#${config.rules_channel}>\n\n- True Colors Administration`)
-                            member.kick(`Automatic kick by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                        if (action == 'KICK') {
+                            if (!member.user.bot) {
+                                member.send(`You have been kicked for \`${reason}\`. Please be more mindful next time.\nRules can be found here: <#${config.rules_channel}>\n\n- True Colors Administration`)
+                                member.kick(`Automatic kick by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                            }
                         }
                         if (action == 'BAN') { 
-                            member.send(`You have been banned for \`${reason}\`. [appeal info]\n\n- True Colors Administration`)
-                            member.ban(`Automatic ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                            if (!member.user.bot) {
+                                member.send(`You have been banned for \`${reason}\`. [appeal info]\n\n- True Colors Administration`)
+                                member.ban(`Automatic ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                            }
                         }
                         if (action == 'PERM_BAN') { 
-                            member.send(`Due to a severe rule violations or recurring violations, you have been **permenately** banned for \`${reason}\`.\n\n- True Colors Administration`)
-                            member.ban(`Automatic perm ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                            if (!member.user.bot) {
+                                member.send(`Due to a severe rule violations or recurring violations, you have been **permenately** banned for \`${reason}\`.\n\n- True Colors Administration`)
+                                member.ban(`Automatic perm ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                            }
                         }
                     })
                     .catch(err => {

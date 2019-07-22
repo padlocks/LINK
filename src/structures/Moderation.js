@@ -42,18 +42,34 @@ module.exports = class Moderation {
         return `${username} (${id})`
     }
 
+    static async getStaffResponsibleName(logId) {
+        return db.prepare(`SELECT staff_username FROM logs WHERE rowid=${logId}`).pluck().get()
+    }
+
+    static async getStaffResponsibleId(logId) {
+        return db.prepare(`SELECT staff_id FROM logs WHERE rowid=${logId}`).pluck().get()
+    }
+
     static async getUser(logId) {
         let username = db.prepare(`SELECT username FROM logs WHERE rowid=${logId}`).pluck().get()
         let id = db.prepare(`SELECT user_id FROM logs WHERE rowid=${logId}`).pluck().get()
 
         return `${username} (${id})`
     }
+
+    static async getUserId(logId) {
+        return db.prepare(`SELECT user_id FROM logs WHERE rowid=${logId}`).pluck().get()
+    }
     
-    static async getUserLogAmount(userId) {
+    static async getTotalUserLogAmount(userId) {
         let amount = 0
         let data = db.prepare(`SELECT rowid FROM logs WHERE user_id=${userId}`).all()
         data.forEach((elem) => { amount++ })
         return amount
+    }
+
+    static async getUserLogNumber(userId) {
+        return db.prepare(`SELECT user_log_num FROM logs WHERE user_id=${userId}`).pluck().get() || 0
     }
 
     static async getAction(logId) {
@@ -89,13 +105,18 @@ module.exports = class Moderation {
         return evidenceString
     }
 
+    static async getAllComments(logId) {
+        let data = db.prepare(`SELECT * FROM comments WHERE log_id=${logId}`).all()
+        return data
+    }
+
     /*
      * Set Methods
      */
     static async addPoints(userId, username, reason) {
         let userData = db.prepare(`SELECT * FROM users WHERE id='${userId}'`).pluck().get()
         if (!userData) {
-            db.prepare(`INSERT INTO users VALUES(${userId}, '${username}', 0, 0, 0, 0)`).run()
+            db.prepare(`INSERT INTO users VALUES(${userId}, '${username}', 0, 0, 0, 0, 0)`).run()
         }
 
         let userPoints = await this.getPoints(userId)
@@ -115,6 +136,7 @@ module.exports = class Moderation {
         await this.addPoints(userId, username, reason)
 
         let action = await this.calculateAction(await this.getPoints(userId), await this.getWarnings(userId), await this.getKicks(userId), await this.getBans(userId))
+        let userLogNum = await this.getTotalUserLogAmount(userId) + 1
 
         if (action == 'WARNING' || action == 'WARNING_PERM_NEXT') { 
             db.prepare(`UPDATE users SET warnings = ${await this.getWarnings(userId) + 1} WHERE id = '${userId}'`).run()
@@ -133,7 +155,8 @@ module.exports = class Moderation {
             db.prepare(`INSERT INTO perm_bans VALUES(${userId}, '${username}', '${datetime}')`).run()
         }
         
-        db.prepare(`INSERT INTO logs VALUES('${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}')`).run()
+        db.prepare(`INSERT INTO logs VALUES('${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
+        db.prepare(`UPDATE users SET logs = ${userLogNum}`).run()
 
         return action
     }
@@ -156,7 +179,7 @@ module.exports = class Moderation {
         let hours = (date.getHours() < 10 ? "0" : "") + date.getHours()
         let time = `${hours}:${minutes}`
         let datetime = `${day} @ ${time} (PST)`
-        db.prepare(`INSERT INTO comments(id, time, staff, staff_id, comment) VALUES(${logId}, '${datetime}', '${staffUsername}', '${staffId}', '${comment}')`).run()
+        db.prepare(`INSERT INTO comments(log_id, time, staff, staff_id, content) VALUES(${logId}, '${datetime}', '${staffUsername}', '${staffId}', '${comment}')`).run()
     }
 
     static async calculateAction(points, warnings, kicks, bans) {
