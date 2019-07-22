@@ -20,7 +20,7 @@ module.exports = class Moderation {
             }
         })
 
-        return db.prepare('SELECT max(rowid) FROM logs').pluck().get() || 0
+        return db.prepare('SELECT max(rowid) FROM logs').pluck().get() || 100
     }
 
     static async getReason(logId) {

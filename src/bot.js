@@ -17,6 +17,11 @@ var client = new CommandoClient({
 client.on('error', Logger.error)
     .on('ready', () => {
         Logger.info(`[DISCORD]: client ready\nuser info: ${client.user.tag} id:${client.user.id}`)
+        client.user.setPresence({
+            game: {
+                name: 'with commands.'
+            }
+        })
     })
     .on('disconnect', () => Logger.info('[DISCORD]: client disconnect'))
     .on('commandRun', (cmd, promise, msg, args) =>

@@ -35,14 +35,14 @@ module.exports = class LogEvidenceCommand extends Command {
         let time = `${hours}:${minutes}`
         let datetime = `${day} @ ${time} (PST)`
 
-        let staff = await Moderation.getStaffResponsible(logId)
+        let staff = await Moderation.getStaffResponsibleId(logId)
         let user = await Moderation.getUser(logId)
         let reason = await Moderation.getReason(logId)
         let evidenceString = await Moderation.getEvidenceString(logId)
         let embed = new RichEmbed
-        embed.setAuthor(`Staff: ${staff}`)
         embed.setColor('#FF0000')
         embed.setTitle(`Evidence for LogID: ${logId}`)
+        embed.addField('Logged by', `<@${staff}>`)
         embed.addField('User', `${user}`)
         embed.addField('Reason', `${reason}`)
         embed.addField('Evidence', `${evidenceString || 'None.'}`)

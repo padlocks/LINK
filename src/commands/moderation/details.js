@@ -8,7 +8,7 @@ module.exports = class DetailsCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'details',
-            aliases: ['details'],
+            aliases: ['details', 'comments', 'thread'],
             group: 'moderation',
             memberName: 'details',
             description: 'Displays comments left by staff on a log.',
@@ -35,7 +35,6 @@ module.exports = class DetailsCommand extends Command {
     }
 
     async run(msg, { logId, page }) {
-        let staff = await Moderation.getStaffResponsibleName(logId)
         let staffId = await Moderation.getStaffResponsibleId(logId)
         let user = await Moderation.getUser(logId)
         let userId = await Moderation.getUserId(logId)
@@ -51,13 +50,13 @@ module.exports = class DetailsCommand extends Command {
         embed.setFooter(`Staff Comments Page #${paginated.page} of ${paginated.maxPage}`)
 
         embed.setDescription(stripIndents`
-        Logged by: ${staff} (${staffId})
-        Reason: ${reason} 
+        Logged by: <@${staffId}>
+        Reason: **${reason}**
         Time of log: ${logTime}
         
         ${paginated.items.map(comment => `
-                **${comment['staff']} (${comment['staff_id']}) at ${comment['time']}**:
-                *${comment['content']}*
+                <@${comment['staff_id']}> at ${comment['time']}:
+                **${comment['content']}**
             `).join('\n')}
         `)
 
