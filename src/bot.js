@@ -1,3 +1,5 @@
+// TODO: BEFORE PRODUCTION, either convert db to PostgreSQL and keep the data under 10k rows, or find a way to back up tc.db.
+
 var { FriendlyError, CommandoClient } = require('discord.js-commando')
 var { oneLine } = require('common-tags')
 var path = require('path')
