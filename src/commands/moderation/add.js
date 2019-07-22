@@ -34,26 +34,25 @@ module.exports = class AddEvidenceCommand extends Command {
     }
 
     async run(msg, { logId, url }) {
-        // TODO: url from string is stored as undefined in the database
         let evidence
 
         // check if evidence is a url or an attachment..
         if (url == 'NONE') {
             if (msg.attachments.first()) {
                 evidence = msg.attachments.first().url
+                await Moderation.addEvidence(logId, evidence)
+                    .then(() => { return msg.react('\u2705') })
+                    .catch(err => { Logger.error(err) })
             } else {
                 return msg.channel.send('No evidence supplied.')
             }
             
         } else {
-            urlChecker.verify(url, () => {
-                console.log(typeof url)
-                evidence = url.toString()
+            urlChecker.verify(url, async () => {
+                await Moderation.addEvidence(logId, url)
+                    .then(() => { return msg.react('\u2705') })
+                    .catch(err => { Logger.error(err) })
             })
         }
-
-        await Moderation.addEvidence(logId, evidence)
-            .then(() => { return msg.react('\u2705') })
-            .catch(err => { Logger.error(err) })
     }
 }
