@@ -248,11 +248,11 @@ module.exports = class Moderation {
 
         // First kick
         if (points < config.lowKick1Points && warnings < 2) return 'WARNING'
-        if ((points > config.lowKick1Points && points < config.lowBan1Points) || (warnings == 2)) return 'KICK'
+        if ((points > config.lowKick1Points && points < config.lowBan1Points) || (warnings == 2 && kicks == 0 && bans == 0)) return 'KICK'
 
         // First ban
         if (points < config.lowBan1Points && warnings < 3) return 'WARNING'
-        if ((points > config.lowBan1Points && points < config.lowKick2Points) || (warnings == 3 && kicks == 1)) return 'BAN'
+        if ((points > config.lowBan1Points && points < config.lowKick2Points) || (warnings == 3 && kicks == 1 && bans == 0)) return 'BAN'
 
         // Second kick
         if (points < config.lowKick2Points && warnings < 5) return 'WARNING'

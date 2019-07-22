@@ -45,7 +45,7 @@ module.exports = class LogEvidenceCommand extends Command {
         embed.setTitle(`Evidence for LogID: ${logId}`)
         embed.addField('User', `${user}`)
         embed.addField('Reason', `${reason}`)
-        embed.addField('Evidence', `${evidenceString}`)
+        embed.addField('Evidence', `${evidenceString || 'None.'}`)
         embed.setFooter(`${datetime}`)
 
         return msg.channel.send(embed)

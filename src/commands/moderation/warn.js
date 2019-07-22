@@ -59,7 +59,7 @@ module.exports = class WarnCommand extends Command {
 
         let embed = new RichEmbed
         embed.setAuthor(`${member.user.tag} (${member.user.id}) | User Log #${logNum}`)
-        embed.setDescription(`See evidence using '!evidence ${logId}'\nAdd evidence using '!add' with an attachment.`)
+        embed.setDescription(`See evidence using '!logevidence ${logId}'\nAdd evidence using '!add' with an attachment.`)
         embed.setColor('#FF0000')
         embed.setTitle(`LogID: ${logId}`)
         embed.addField('Staff', `${msg.author.tag}`)

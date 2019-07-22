@@ -36,6 +36,8 @@ module.exports = class EvidenceCommand extends Command {
 
     async run(msg, { member, page }) {
         let evidence = await Moderation.getAllUserEvidence(member.user.id)
+        if (evidence.length == 0) return msg.reply('this user has no evidence uploaded.')
+
         let paginated = util.paginate(evidence, page, Math.floor(10))
         let embed = new RichEmbed
         embed.setAuthor(`Evidence for ${member.user.tag} (${member.user.id})`)
