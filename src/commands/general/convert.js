@@ -38,7 +38,7 @@ module.exports = class ConvertCommand extends Command {
         d = d.goto(convertTo)
 
         let embed = new RichEmbed()
-        embed.setTitle(`Timezone Conversion`)
+        embed.setTitle('Timezone Conversion')
         embed.setColor('RANDOM')
         embed.addField('America/Los_Angeles', time)
         embed.addField(`${convertTo}`, d.time())

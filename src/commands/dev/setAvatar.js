@@ -1,5 +1,5 @@
 var { Command } = require('discord.js-commando')
-
+var Logger = require('../../utils/Logger.js')
 module.exports = class SetAvatarCommand extends Command {
     constructor(client) {
         super(client, {
@@ -30,6 +30,6 @@ module.exports = class SetAvatarCommand extends Command {
     async run(msg, { imgURL }) {
         msg.author.client.user.setAvatar(imgURL)
             .then(() => msg.react('\u2705'))
-            .catch(console.error)
+            .catch(Logger.error)
     }
 }

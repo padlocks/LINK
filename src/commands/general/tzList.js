@@ -16,7 +16,7 @@ module.exports = class TZListCommand extends Command {
         return msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
-    async run(msg, { time, convertTo }) {
+    async run(msg) {
         return msg.channel.send('Most timezones available in the list on this wikipedia link will work:\n<https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>\n\nBe sure to use "TZ database name" as the timezone you are converting to. ')
     }
 }
