@@ -1,15 +1,5 @@
-  stages:
-  - test
-  - build
+stages:
   - deploy
-
-test:
-  stage: test
-  script: echo "Running tests"
-
-build:
-  stage: build
-  script: echo "Building the app"
 
 deploy_prod:
   stage: deploy
