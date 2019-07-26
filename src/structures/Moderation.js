@@ -20,50 +20,54 @@ module.exports = class Moderation {
             }
         })
 
-        return db.prepare('SELECT max(rowid) FROM logs').pluck().get() || 100
+        return db.prepare('SELECT max(id) FROM logs').pluck().get() || 100
     }
 
     static async getReason(logId) {
-        return db.prepare(`SELECT reason FROM logs WHERE rowid='${logId}'`).pluck().get()
+        return db.prepare(`SELECT reason FROM logs WHERE id='${logId}'`).pluck().get()
     }
 
     static async getLogTime(logId) {
-        return db.prepare(`SELECT time FROM logs WHERE rowid=${logId}`).pluck().get()
+        return db.prepare(`SELECT time FROM logs WHERE id=${logId}`).pluck().get()
     }
 
     static async getMessageId(logId) {
-        return db.prepare(`SELECT log_message_id FROM logs WHERE rowid=${logId}`).pluck().get()
+        return db.prepare(`SELECT log_message_id FROM logs WHERE id=${logId}`).pluck().get()
     }
 
     static async getStaffResponsible(logId) {
-        let username = db.prepare(`SELECT staff_username FROM logs WHERE rowid=${logId}`).pluck().get()
-        let id = db.prepare(`SELECT staff_id FROM logs WHERE rowid=${logId}`).pluck().get()
+        let username = db.prepare(`SELECT staff_username FROM logs WHERE id=${logId}`).pluck().get()
+        let id = db.prepare(`SELECT staff_id FROM logs WHERE id=${logId}`).pluck().get()
 
         return `${username} (${id})`
     }
 
     static async getStaffResponsibleName(logId) {
-        return db.prepare(`SELECT staff_username FROM logs WHERE rowid=${logId}`).pluck().get()
+        return db.prepare(`SELECT staff_username FROM logs WHERE id=${logId}`).pluck().get()
     }
 
     static async getStaffResponsibleId(logId) {
-        return db.prepare(`SELECT staff_id FROM logs WHERE rowid=${logId}`).pluck().get()
+        return db.prepare(`SELECT staff_id FROM logs WHERE id=${logId}`).pluck().get()
     }
 
     static async getUser(logId) {
-        let username = db.prepare(`SELECT username FROM logs WHERE rowid=${logId}`).pluck().get()
-        let id = db.prepare(`SELECT user_id FROM logs WHERE rowid=${logId}`).pluck().get()
+        let username = db.prepare(`SELECT username FROM logs WHERE id=${logId}`).pluck().get()
+        let id = db.prepare(`SELECT user_id FROM logs WHERE id=${logId}`).pluck().get()
 
         return `${username} (${id})`
     }
 
+    static async getUserName(logId) {
+        return db.prepare(`SELECT username FROM logs WHERE id=${logId}`).pluck().get()
+    }
+
     static async getUserId(logId) {
-        return db.prepare(`SELECT user_id FROM logs WHERE rowid=${logId}`).pluck().get()
+        return db.prepare(`SELECT user_id FROM logs WHERE id=${logId}`).pluck().get()
     }
     
     static async getTotalUserLogAmount(userId) {
         let amount = 0
-        let data = db.prepare(`SELECT id FROM logs WHERE user_id=${userId}`).all()
+        let data = db.prepare(`SELECT rowid FROM logs WHERE user_id=${userId}`).all()
         data.forEach((elem) => { amount++ })
         return amount
     }
@@ -77,7 +81,7 @@ module.exports = class Moderation {
     }
 
     static async getAction(logId) {
-        return db.prepare(`SELECT action FROM logs WHERE rowid=${logId}`).pluck().get()
+        return db.prepare(`SELECT action FROM logs WHERE id=${logId}`).pluck().get()
     }
 
     static async getPoints(userId) {

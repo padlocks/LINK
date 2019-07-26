@@ -35,19 +35,15 @@ module.exports = class LogEvidenceCommand extends Command {
     }
 
     async run(msg, { logId, page }) {
-        let date = new Date()
-        let day = date.toDateString()
-        let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
-        let hours = (date.getHours() < 10 ? "0" : "") + date.getHours()
-        let time = `${hours}:${minutes}`
-        let datetime = `${day} @ ${time} (PST)`
+        // check logId is valid:
+        let reason = await Moderation.getReason(logId)
+        if (!reason) return msg.reply(`log with ID '${logId}' does not exist.`)
 
         let evidence = await Moderation.getLogEvidence(logId)
         if (evidence.length == 0) return msg.reply('this user has no evidence uploaded.')
 
         let userId = await Moderation.getUserId(logId)
-        let userLogNum = await Moderation.getUserLogNumber(userId)
-        let reason = await Moderation.getReason(logId)
+        let userLogNum = await Moderation.getUserLogNumber(userId)   
         let paginated = util.paginate(evidence, page, Math.floor(5)) // 5 pieces of evidence per page.
 
         let embed = new RichEmbed
