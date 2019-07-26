@@ -1,4 +1,7 @@
+// TODO: BEFORE PRODUCTION, either convert db to PostgreSQL and keep the data under 10k rows, or find a way to back up tc.db.
+
 var { FriendlyError, CommandoClient } = require('discord.js-commando')
+var { RichEmbed } = require('discord.js')
 var { oneLine } = require('common-tags')
 var path = require('path')
 var Logger = require('./utils/Logger.js')
@@ -15,6 +18,19 @@ var client = new CommandoClient({
 client.on('error', Logger.error)
     .on('ready', () => {
         Logger.info(`[DISCORD]: client ready\nuser info: ${client.user.tag} id:${client.user.id}`)
+        client.user.setPresence({
+            game: {
+                name: 'with commands.'
+            }
+        })
+        
+        let embed = new RichEmbed
+        embed.setTitle('True Colors Auto-Moderation is Online')
+        embed.setColor('#00FF00')
+        embed.addField('Version', `${config.version}`)
+        embed.addField('Latest Changes', `${config.update_text}`)
+        embed.setFooter('Created by atom#0001 for the True Colors Administration')
+        client.channels.get(config.startup_channel).send(embed)
     })
     .on('disconnect', () => Logger.info('[DISCORD]: client disconnect'))
     .on('commandRun', (cmd, promise, msg, args) =>

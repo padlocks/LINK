@@ -4,21 +4,21 @@ var { RichEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
 
-module.exports = class EvidenceCommand extends Command {
+module.exports = class LogEvidenceCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'evidence',
-            aliases: ['evidence'],
+            name: 'logevidence',
+            aliases: ['logevidence'],
             group: 'moderation',
-            memberName: 'evidence',
-            description: 'Displays evidence',
+            memberName: 'logevidence',
+            description: 'Displays evidence via logId',
             guildOnly: true,
 
             args: [
                 {
-                    key: 'member',
-                    prompt: 'What member\'s evidence would you like to view?\n',
-                    type: 'member'
+                    key: 'logId',
+                    prompt: 'What is the log (id) you want to view evidence for?\n',
+                    type: 'integer'
                 },
                 {
                     key: 'page',
@@ -34,22 +34,28 @@ module.exports = class EvidenceCommand extends Command {
         return msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
-    async run(msg, { member, page }) {
-        let evidence = await Moderation.getAllUserEvidence(member.user.id)
+    async run(msg, { logId, page }) {
+        // check logId is valid:
+        let reason = await Moderation.getReason(logId)
+        if (!reason) return msg.reply(`log with ID '${logId}' does not exist.`)
+
+        let evidence = await Moderation.getLogEvidence(logId)
         if (evidence.length == 0) return msg.reply('this user has no evidence uploaded.')
 
+        let userId = await Moderation.getUserId(logId)
+        let userLogNum = await Moderation.getUserLogNumber(userId)   
         let paginated = util.paginate(evidence, page, Math.floor(5)) // 5 pieces of evidence per page.
-        let embed = new RichEmbed
-        embed.setAuthor(`Evidence for ${member.user.tag} (${member.user.id})`)
-        embed.setColor('RANDOM')
-        embed.setFooter(`User Evidence Page #${paginated.page} of ${paginated.maxPage}`)
 
+        let embed = new RichEmbed
+        embed.setColor('RANDOM')
+        embed.setTitle(`Evidence for LogID: ${logId}`)
+        embed.setFooter(`Evidence Log Page #${paginated.page} of ${paginated.maxPage}`)
         embed.setDescription(stripIndents`
+        **User Log #${userLogNum} (ID: ${logId})**:
+        Reason: ${reason}
+
         ${paginated.items.map(evidence => `
-                **User Log #${evidence['user_log_num']} (ID: ${evidence['id']})**:
-                Reason: ${evidence['reason']}
-                Evidence: ${evidence['evidence_url']}
-                Time Added: ${evidence['time']}
+                **${evidence['time']}**: ${evidence['evidence_url']}
             `).join('\n')}
         `)
 

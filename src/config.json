@@ -3,5 +3,16 @@
     "prefix": "!",
     "token": "NDc2NDY3MDM5OTQzMjYyMjE4.XR-z-Q.U8N0RPTVgejlx5Qkc9BNcABVHEg",
     "log_channel": "597081559442391042",
-    "default_tz": "America/Los_Angeles"
+    "startup_channel": "598879940011622411",
+    "rules_channel": "294853711539470338",
+    "default_tz": "Africa/Abidjan",
+    "timezone": "UTC/GMT",
+    "lowKick1Points": 6,
+    "lowBan1Points": 10,
+    "lowKick2Points": 16,
+    "lowBan2Points": 22,
+    "lowKick3Points": 28,
+    "lowPermPoints": 34,
+    "version": "0.2.1",
+    "update_text": "**0.2.1**:\n- Bug fixes and improvements. :thumbsup:\n**0.2.0**:\n- Fully implemented reason values (automatic aspect)\n- When you warn a user, they receive a message with the reason.\n- Evidence can be uploaded with attachments AND links.\n- logevidence command views evidence with a given logId. `!logevidence <logId>`\n- Evidence command was changed to view all evidence available for the user. `!evidence <user tag>`\n- Integrated comments / staff threads. `!comment <logId> <message>` This is intended to be used if you have more details to attach to the log.\n- Details command to view all comments on a log. `!details <user tag>`\n- Logs command to view user moderation stats and a list of all user logs. `!logs <user tag>`\n- General improvements, bug fixes and increased stability."
 }

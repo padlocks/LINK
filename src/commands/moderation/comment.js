@@ -16,8 +16,8 @@ module.exports = class CommentCommands extends Command {
             args: [
                 {
                     key: 'logId',
-                    prompt: 'What is the log (id) you want to add evidence to?\n',
-                    type: 'member'
+                    prompt: 'What is the log (id) you want to add a comment to?\n',
+                    type: 'integer'
                 },
                 {
                     key: 'comment',
@@ -33,20 +33,8 @@ module.exports = class CommentCommands extends Command {
     }
 
     async run(msg, { logId, comment }) {
-        let channel = msg.guild.channels.get(config.log_channel)
-        let messageId = await Moderation.getMessageId(logId)
-        let logTime = await Moderation.getLogTime(logId)
-        let log = channel.fetchMessage(messageId)
-
-
-        log.embeds[0]
-            .addField('Comments', `<${evidence}>`)
-            .setFooter(`${logTime}`)
-        log.edit(log)
-            .then(async () => {
-                await Moderation.addEvidence(logId, evidence)
-                log.embeds[0].setFooter(`✓ ${logTime}`)
-                return log.edit(embed)
-            })
+        await Moderation.addComment(logId, msg.author.tag, msg.author.id, comment)
+            .then(() => { return msg.react('\u2705') })
+            .catch(err => { Logger.error(err) })
     }
 }
