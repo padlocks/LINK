@@ -34,6 +34,10 @@ module.exports = class AddEvidenceCommand extends Command {
     }
 
     async run(msg, { logId, url }) {
+        // check if log even exists..
+        let reason = await Moderation.getReason(logId)
+        if (!reason) return msg.reply(`log with ID '${logId}' does not exist.`)
+        // it does, lets continue..
         let evidence
 
         // check if evidence is a url or an attachment..

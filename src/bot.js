@@ -27,6 +27,7 @@ client.on('error', Logger.error)
         let embed = new RichEmbed
         embed.setTitle('True Colors Auto-Moderation is Online')
         embed.setColor('#00FF00')
+        embed.addField('Version', `${config.version}`)
         embed.addField('Latest Changes', `${config.update_text}`)
         embed.setFooter('Created by atom#0001 for the True Colors Administration')
         client.channels.get(config.startup_channel).send(embed)
