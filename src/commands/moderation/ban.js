@@ -35,7 +35,7 @@ module.exports = class BanCommand extends Command {
             return
         }
         member.ban().then(member => {
-
+            return msg.react('\u2705')
         })
     }
 }
