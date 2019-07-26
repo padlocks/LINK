@@ -101,12 +101,17 @@ module.exports = class Moderation {
     }
 
     static async getEvidenceString(logId) {
+        // Depreciated in favor of pagination.
         let evidenceString = ''
         let data = db.prepare(`SELECT evidence_url FROM evidence WHERE id=${logId}`).all()
         data.forEach((elem) => {
             evidenceString = evidenceString + `<${elem['evidence_url']}>` + '\n'
         })
         return evidenceString
+    }
+
+    static async getLogEvidence(logId) {
+        return db.prepare(`SELECT * FROM evidence WHERE id=${logId}`).all()
     }
 
     static async getAllUserEvidence(userId) {

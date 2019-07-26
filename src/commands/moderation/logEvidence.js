@@ -1,4 +1,5 @@
-var { Command } = require('discord.js-commando')
+var { Command, util } = require('discord.js-commando')
+var { stripIndents } = require('common-tags')
 var { RichEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
@@ -18,6 +19,12 @@ module.exports = class LogEvidenceCommand extends Command {
                     key: 'logId',
                     prompt: 'What is the log (id) you want to view evidence for?\n',
                     type: 'integer'
+                },
+                {
+                    key: 'page',
+                    prompt: 'What page would you like to view?\n',
+                    type: 'integer',
+                    default: 1
                 }
             ]
         })
@@ -27,7 +34,7 @@ module.exports = class LogEvidenceCommand extends Command {
         return msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
-    async run(msg, { logId }) {
+    async run(msg, { logId, page }) {
         let date = new Date()
         let day = date.toDateString()
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
@@ -35,18 +42,26 @@ module.exports = class LogEvidenceCommand extends Command {
         let time = `${hours}:${minutes}`
         let datetime = `${day} @ ${time} (PST)`
 
-        let staff = await Moderation.getStaffResponsibleId(logId)
-        let user = await Moderation.getUser(logId)
+        let evidence = await Moderation.getLogEvidence(logId)
+        if (evidence.length == 0) return msg.reply('this user has no evidence uploaded.')
+
+        let userId = await Moderation.getUserId(logId)
+        let userLogNum = await Moderation.getUserLogNumber(userId)
         let reason = await Moderation.getReason(logId)
-        let evidenceString = await Moderation.getEvidenceString(logId)
+        let paginated = util.paginate(evidence, page, Math.floor(5)) // 5 pieces of evidence per page.
+
         let embed = new RichEmbed
-        embed.setColor('#FF0000')
+        embed.setColor('RANDOM')
         embed.setTitle(`Evidence for LogID: ${logId}`)
-        embed.addField('Logged by', `<@${staff}>`)
-        embed.addField('User', `${user}`)
-        embed.addField('Reason', `${reason}`)
-        embed.addField('Evidence', `${evidenceString || 'None.'}`)
-        embed.setFooter(`${datetime}`)
+        embed.setFooter(`Evidence Log Page #${paginated.page} of ${paginated.maxPage}`)
+        embed.setDescription(stripIndents`
+        **User Log #${userLogNum} (ID: ${logId})**:
+        Reason: ${reason}
+
+        ${paginated.items.map(evidence => `
+                **${evidence['time']}**: ${evidence['evidence_url']}
+            `).join('\n')}
+        `)
 
         return msg.channel.send(embed)
             .catch(err => { Logger.error(err) })
