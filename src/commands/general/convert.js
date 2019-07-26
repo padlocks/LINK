@@ -33,6 +33,7 @@ module.exports = class ConvertCommand extends Command {
     }
 
     async run(msg, { time, convertTo }) {
+        // TODO: allow informal names such as UTC, GMT, PST, etc.
         let d = spacetime.now(config.default_tz)
         d = d.time(time)
         d = d.goto(convertTo)
@@ -40,7 +41,7 @@ module.exports = class ConvertCommand extends Command {
         let embed = new RichEmbed()
         embed.setTitle('Timezone Conversion')
         embed.setColor('RANDOM')
-        embed.addField('America/Los_Angeles', time)
+        embed.addField('UTC/GMT', time)
         embed.addField(`${convertTo}`, d.time())
 
         return msg.channel.send(embed)
