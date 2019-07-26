@@ -58,7 +58,7 @@ module.exports = class WarnCommand extends Command {
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
         let hours = (date.getHours() < 10 ? "0" : "") + date.getHours()
         let time = `${hours}:${minutes}`
-        let datetime = `${day} @ ${time} (PST)`
+        let datetime = `${day} @ ${time} (${config.timezone})`
 
         let logId = await Moderation.getIncompleteLogId() + 1
         let logNum = await Moderation.getTotalUserLogAmount(member.user.id) + 1

@@ -148,7 +148,7 @@ module.exports = class Moderation {
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
         let hours = (date.getHours() < 10 ? "0" : "") + date.getHours()
         let time = `${hours}:${minutes}`
-        let datetime = `${day} @ ${time} (PST)`
+        let datetime = `${day} @ ${time} (${config.timezone})`
 
         await this.addPoints(userId, username, reason)
 
@@ -185,7 +185,7 @@ module.exports = class Moderation {
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
         let hours = (date.getHours() < 10 ? "0" : "") + date.getHours()
         let time = `${hours}:${minutes}`
-        let datetime = `${day} @ ${time} (PST)`
+        let datetime = `${day} @ ${time} (${config.timezone})`
 
         let user = await this.getUserId(logId)
         let userLogNum = await this.getTotalUserLogAmount(user)
@@ -200,7 +200,7 @@ module.exports = class Moderation {
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
         let hours = (date.getHours() < 10 ? "0" : "") + date.getHours()
         let time = `${hours}:${minutes}`
-        let datetime = `${day} @ ${time} (PST)`
+        let datetime = `${day} @ ${time} (${config.timezone})`
         db.prepare(`INSERT INTO comments(log_id, time, staff, staff_id, content) VALUES(${logId}, '${datetime}', '${staffUsername}', '${staffId}', '${comment}')`).run()
     }
 
