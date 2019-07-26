@@ -6,7 +6,6 @@ var { oneLine } = require('common-tags')
 var path = require('path')
 var Logger = require('./utils/Logger.js')
 var config = require('./config.json')
-var token = config.token
 
 var client = new CommandoClient({
     owner: config.dev,
@@ -27,7 +26,7 @@ client.on('error', Logger.error)
         let embed = new RichEmbed
         embed.setTitle('True Colors Auto-Moderation is Online')
         embed.setColor('#00FF00')
-        embed.addField('Version', `${config.version}`)
+        embed.addField('Current Version', `${config.version}`)
         embed.addField('Latest Changes', `${config.update_text}`)
         embed.setFooter('Created by atom#0001 for the True Colors Administration')
         client.channels.get(config.startup_channel).send(embed)
@@ -69,4 +68,4 @@ client.registry
     .registerTypesIn(path.join(__dirname, 'types'))
     .registerCommandsIn(path.join(__dirname, 'commands'))
 
-client.login(token)
+client.login(config.token)

@@ -2,6 +2,7 @@ var { Command } = require('discord.js-commando')
 var { RichEmbed } = require('discord.js')
 var config = require('../../config')
 var spacetime = require('spacetime')
+var informal = require('../../utils/spacetime-informal')
 
 module.exports = class ConvertCommand extends Command {
     constructor(client) {
@@ -16,12 +17,12 @@ module.exports = class ConvertCommand extends Command {
             args: [
                 {
                     key: 'time',
-                    prompt: 'What time are you trying to convert? Format: 5:30pm\n',
+                    prompt: 'What time are you trying to convert? Format: `5:30pm` or `23:30`\n',
                     type: 'string'
                 },
                 {
                     key: 'convertTo',
-                    prompt: 'What time zone are you converting to? Remember, all times are stored in the bot as America/Los_Angeles.\n',
+                    prompt: 'What time zone are you converting to? Remember, all times are stored in the bot as UTC/GMT.\n',
                     type: 'string'
                 }
             ]
@@ -33,16 +34,22 @@ module.exports = class ConvertCommand extends Command {
     }
 
     async run(msg, { time, convertTo }) {
-        // TODO: allow informal names such as UTC, GMT, PST, etc.
-        let d = spacetime.now(config.default_tz)
-        d = d.time(time)
-        d = d.goto(convertTo)
+        convertTo = convertTo.toLowerCase()
+
+        let defaultTime = spacetime.now(informal.find(config.default_tz.toLowerCase()))
+        let d = defaultTime.time(time)
+        // if a timezone is found, use it.
+        if(!informal.find(convertTo) || d.goto(informal.find(convertTo)).time() == defaultTime.time()) {
+            return msg.reply('timezone is invalid or the conversion resulted in the same time. Contact atom#0001 if you believe this is a mistake.')
+        } else {
+            d = d.goto(informal.find(convertTo))
+        }
 
         let embed = new RichEmbed()
         embed.setTitle('Timezone Conversion')
         embed.setColor('RANDOM')
-        embed.addField('UTC/GMT', time)
-        embed.addField(`${convertTo}`, d.time())
+        embed.addField('UTC/GMT Time', time)
+        embed.addField(`${convertTo.toUpperCase()} Time`, d.time())
 
         return msg.channel.send(embed)
     }

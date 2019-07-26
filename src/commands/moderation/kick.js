@@ -35,7 +35,7 @@ module.exports = class KickCommand extends Command {
             return
         }
         member.kick().then(member => {
-
+            return msg.react('\u2705')
         })
     }
 }
