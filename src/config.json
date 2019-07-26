@@ -5,7 +5,7 @@
     "log_channel": "597081559442391042",
     "startup_channel": "598879940011622411",
     "rules_channel": "294853711539470338",
-    "default_tz": "Africa/Abidjan",
+    "default_tz": "UTC",
     "timezone": "UTC/GMT",
     "lowKick1Points": 6,
     "lowBan1Points": 10,
