@@ -9,7 +9,7 @@ app.get("/", (request, response) => {
 app.listen(process.env.PORT)
 setInterval(() => {
   http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`)
-}, 280000);
+}, 280000)
 
 var { FriendlyError, CommandoClient } = require('discord.js-commando')
 var { RichEmbed } = require('discord.js')
