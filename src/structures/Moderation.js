@@ -9,6 +9,13 @@ module.exports = class Moderation {
      * Get Methods
      */
 
+    static async isLegacy(logId) {
+        // legacy is used to see if the log was from the old system.
+        let data = db.prepare(`SELECT legacy FROM logs WHERE id='${logId}'`).pluck().get()
+        if (data == 0) return false
+        if (data == 1) return true
+    }
+
     static async getIncompleteLogId() {
         db.aggregate('max', {
             start: 0,
@@ -177,6 +184,41 @@ module.exports = class Moderation {
         db.prepare(`UPDATE users SET logs = ${userLogNum}`).run()
 
         return action
+    }
+
+    static async addUserLegacy(userId, username) {
+        let userData = db.prepare(`SELECT * FROM users WHERE id='${userId}'`).pluck().get()
+        if (!userData) {
+            db.prepare(`INSERT INTO users VALUES(${userId}, '${username}', 0, 0, 0, 0, 0)`).run()
+        }
+    }
+
+    static async addLogLegacy(datetime, messageId, username, userId, staff, staffId, reason, action) {
+        // addLog() with support for legacy content
+        await this.addUserLegacy(userId, username)
+
+        let userLogNum = await this.getTotalUserLogAmount(userId) + 1
+        let logId = await this.getIncompleteLogId() + 1
+        
+        db.prepare(`INSERT INTO logs VALUES(${logId}, '${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
+        db.prepare(`UPDATE users SET logs = ${userLogNum}`).run()
+        
+        if (action == 'WARNING' || action == 'WARNING_PERM_NEXT') { 
+            db.prepare(`UPDATE users SET warnings = ${await this.getWarnings(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO warnings VALUES(${userId}, '${username}', '${datetime}')`).run()
+        }
+        if (action == 'KICK') { 
+            db.prepare(`UPDATE users SET kicks = ${await this.getKicks(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO kicks VALUES(${userId}, '${username}', '${datetime}')`).run()
+        }
+        if (action == 'BAN') { 
+            db.prepare(`UPDATE users SET bans = ${await this.getBans(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO bans VALUES(${userId}, '${username}', '${datetime}')`).run()
+        }
+        if (action == 'PERM_BAN') { 
+            db.prepare(`UPDATE users SET bans = ${await this.getBans(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO perm_bans VALUES(${userId}, '${username}', '${datetime}')`).run()
+        }
     }
 
     static async addEvidence(logId, evidenceURL) {
