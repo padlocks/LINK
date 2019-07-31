@@ -3,14 +3,14 @@ var { stripIndents } = require('common-tags')
 var { RichEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
-module.exports = class StatusCommand extends Command {
+module.exports = class LogsCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'status',
-            aliases: ['status', 'logs'],
+            name: 'logs',
+            aliases: ['logs', 'status'],
             group: 'moderation',
-            memberName: 'status',
-            description: 'Returns the moderation status of a user.',
+            memberName: 'logs',
+            description: 'Returns the moderation logs of a user.',
             guildOnly: true,
             throttling: {
                 usages: 2,
@@ -20,7 +20,7 @@ module.exports = class StatusCommand extends Command {
             args: [
                 {
                     key: 'member',
-                    prompt: 'What member\'s status would you like to view?\n',
+                    prompt: 'What member\'s logs would you like to view?\n',
                     type: 'member'
                 },
                 {
@@ -51,8 +51,8 @@ module.exports = class StatusCommand extends Command {
         let paginated = util.paginate(logs, page, Math.floor(5))
         let embed = new RichEmbed
         embed.setColor('RANDOM')
-        embed.setAuthor(`Status of ${member.user.tag} (${member.user.id})`)
-        embed.setFooter(`!evidence <member> | User Status Page #${paginated.page} of ${paginated.maxPage}`)
+        embed.setAuthor(`Logs of ${member.user.tag} (${member.user.id})`)
+        embed.setFooter(`!evidence <member> | User Logs Page #${paginated.page} of ${paginated.maxPage}`)
 
         embed.setDescription(stripIndents`
             **User Stats**

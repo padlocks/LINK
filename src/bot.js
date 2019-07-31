@@ -75,7 +75,8 @@ client.registry
         ['dev', 'Developer'],
         ['moderation', 'Moderation']
     ])
-    .registerDefaults()
+    .registerDefaultTypes()
+    .registerDefaultGroups()
     .registerTypesIn(path.join(__dirname, 'types'))
     .registerCommandsIn(path.join(__dirname, 'commands'))
 
