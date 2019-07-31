@@ -31,7 +31,8 @@
   "scripts": {
     "start": "node ./src/bot.js",
     "fill": "node ./scripts/filldb.js",
-    "init": "node ./scripts/initdb.js"
+    "init": "node ./scripts/initdb.js",
+    "import": "node ./scripts/convertToSystem.js"
   },
   "author": "Pascal Young",
   "private": true,

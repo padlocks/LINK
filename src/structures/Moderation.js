@@ -16,6 +16,13 @@ module.exports = class Moderation {
         if (data == 1) return true
     }
 
+    static async isLegacyImported(userId) {
+        // legacy is used to see if the user was imported from the old system.
+        let data = db.prepare(`SELECT legacy_imported FROM users WHERE id='${userId}'`).pluck().get()
+        if (data == 0) return false
+        if (data == 1) return true
+    }
+
     static async getIncompleteLogId() {
         db.aggregate('max', {
             start: 0,
@@ -189,20 +196,20 @@ module.exports = class Moderation {
     static async addUserLegacy(userId, username) {
         let userData = db.prepare(`SELECT * FROM users WHERE id='${userId}'`).pluck().get()
         if (!userData) {
-            db.prepare(`INSERT INTO users VALUES(${userId}, '${username}', 0, 0, 0, 0, 0)`).run()
+            db.prepare(`INSERT INTO users VALUES(${userId}, '${username}', 0, 0, 0, 0, 0, 1)`).run()
         }
     }
 
-    static async addLogLegacy(datetime, messageId, username, userId, staff, staffId, reason, action) {
+    static async addLogLegacy(logId, datetime, messageId, username, userId, staff, staffId, reason, action) {
         // addLog() with support for legacy content
         await this.addUserLegacy(userId, username)
 
         let userLogNum = await this.getTotalUserLogAmount(userId) + 1
-        let logId = await this.getIncompleteLogId() + 1
+        action = action.toUpperCase()
         
-        db.prepare(`INSERT INTO logs VALUES(${logId}, '${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
+        db.prepare(`INSERT INTO logs VALUES(${logId}, 1, '${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
         db.prepare(`UPDATE users SET logs = ${userLogNum}`).run()
-        
+
         if (action == 'WARNING' || action == 'WARNING_PERM_NEXT') { 
             db.prepare(`UPDATE users SET warnings = ${await this.getWarnings(userId) + 1} WHERE id = '${userId}'`).run()
             db.prepare(`INSERT INTO warnings VALUES(${userId}, '${username}', '${datetime}')`).run()
