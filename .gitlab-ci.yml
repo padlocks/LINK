@@ -1,0 +1,14 @@
+stages:
+  - deploy
+
+deploy_prod:
+  stage: deploy
+  script:
+  - echo "Deploy to production server"
+  - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/tc-automod.git
+  - git push -fq heroku HEAD:master || true
+  environment:
+    name: production
+  when: manual
+  only:
+  - master
