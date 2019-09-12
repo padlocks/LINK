@@ -8,7 +8,7 @@ module.exports = class WarnCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'warn',
-            aliases: ['warn'],
+            aliases: ['warn', 'log'],
             group: 'moderation',
             memberName: 'warn',
             description: 'Warns a user',

@@ -22,6 +22,7 @@ module.exports = class VersionCommand extends Command {
         let embed = new RichEmbed
         embed.setColor('RANDOM')
         embed.addField('Current Version', `${config.version}`)
+        if (config.enableExperiments) embed.addField('enableExperiments', 'true')
         embed.setFooter(`Created by atom#0001 for the True Colors Administration`)
         return msg.channel.send(embed)
     }
