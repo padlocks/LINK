@@ -2,15 +2,15 @@ var { Command, util } = require('discord.js-commando')
 var { stripIndents } = require('common-tags')
 var { RichEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
-var Moderation = require('../../structures/Moderation')
-module.exports = class LogsCommand extends Command {
+var GameAPI = require('../../structures/Game')
+module.exports = class GameLogsCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'logs',
-            aliases: ['logs', 'status'],
+            name: 'gamelogs',
+            aliases: ['glogs', 'gamelogs', 'gamestatus', 'gstatus'],
             group: 'moderation',
-            memberName: 'logs',
-            description: 'Returns the moderation logs of a user.',
+            memberName: 'gamelogs',
+            description: 'Returns the moderation logs of a user in-game.',
             guildOnly: true,
             throttling: {
                 usages: 2,
@@ -19,9 +19,9 @@ module.exports = class LogsCommand extends Command {
 
             args: [
                 {
-                    key: 'member',
-                    prompt: 'What member\'s logs would you like to view?\n',
-                    type: 'member'
+                    key: 'userId',
+                    prompt: 'What user\'s logs would you like to view? (In-game ID)\n',
+                    type: 'string'
                 },
                 {
                     key: 'page',
@@ -37,27 +37,23 @@ module.exports = class LogsCommand extends Command {
         return this.client.isOwner(msg.author) || msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
-    async run(msg, { member, page }) {
-        if (!member) {
-            return msg.reply('invalid user!')
-        }
-
-        let warnings = await Moderation.getWarnings(member.user.id)
-        let kicks = await Moderation.getKicks(member.user.id)
-        let bans = await Moderation.getBans(member.user.id)
-        let totalLogs = await Moderation.getTotalUserLogAmount(member.user.id)
-        let points = await Moderation.getPoints(member.user.id)
-        let logs = await Moderation.getUserLogs(member.user.id)
+    async run(msg, { userId, page }) {
+        let warnings = await GameAPI.getUserGameWarnings(userId)
+        let kicks = await GameAPI.getUserGameKicks(userId)
+        let bans = await GameAPI.getUserGameBans(userId)
+        let totalLogs = await GameAPI.getTotalUserLogAmount(userId)
+        let points = await GameAPI.getPoints(userId)
+        let logs = await GameAPI.getUserLogs(userId)
         let paginated = util.paginate(logs, page, Math.floor(5))
         let embed = new RichEmbed
         embed.setColor('RANDOM')
-        embed.setAuthor(`Logs of ${member.user.tag} (${member.user.id})`)
+        embed.setAuthor(`Logs of ${await GameAPI.getIGNFromIGID(userId)} (${userId})`)
         embed.setFooter(`!evidence <member> | User Logs Page #${paginated.page} of ${paginated.maxPage}`)
 
         embed.setDescription(stripIndents`
             **User Stats**
-            Location: 'DISCORD'
-            User: <@${member.user.id}>
+            Location: 'GAME'
+            User: ${await GameAPI.getIGNFromIGID(userId)} (${userId})
             Warns: ${warnings}
             Kicks: ${kicks}
             Bans: ${bans}
@@ -68,7 +64,7 @@ module.exports = class LogsCommand extends Command {
                 **User Log #${log['user_log_num']} (ID: ${log['id']})**:
                 Reason: **${log['reason']}**
                 Action: **${log['action']}**
-                Staff: <@${log['staff_id']}>
+                Staff: ${log['staff_username']} (${log['staff_id']})
                 Time: ${log['time']}
             `).join('\n')}
         `)

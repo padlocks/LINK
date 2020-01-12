@@ -4,6 +4,8 @@
 
 # Database Files
 tc.db
+tc2.db
+test.db
 
 # Logs
 *.log

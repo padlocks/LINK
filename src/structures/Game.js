@@ -1,8 +1,6 @@
 /*
-    * Moderation.js
-    * Essentially a file of functions to interact with our database.
-     
-    ! getIncompleteLogId() has been renamed to generateLogId()
+    * Game.js
+    * Various methods for interacting with the group games's API.
 */
 
 var Database = require('better-sqlite3')
@@ -69,13 +67,17 @@ module.exports = class Moderation {
         return db.prepare(`SELECT username FROM logs WHERE id=${logId}`).pluck().get()
     }
 
+    static async getIGNFromIGID(igid) {
+        return db.prepare(`SELECT ign FROM users WHERE igid=${igid}`).pluck().get()
+    }
+
     static async getUserId(logId) {
         return db.prepare(`SELECT user_id FROM logs WHERE id=${logId}`).pluck().get()
     }
     
     static async getTotalUserLogAmount(userId) {
         let amount = 0
-        let data = db.prepare(`SELECT rowid FROM logs WHERE user_id=${userId}`).all()
+        let data = db.prepare(`SELECT id FROM logs WHERE user_id=${userId}`).all()
         data.forEach((elem) => { amount++ })
         return amount
     }
@@ -123,11 +125,6 @@ module.exports = class Moderation {
         return data
     }
 
-    static async getAllStaff() {
-        let data = db.prepare(`SELECT * FROM staff`).all()
-        return data
-    }
-
     static async getLogLocation(logId) {
         return db.prepare(`SELECT location FROM logs WHERE id='${logId}'`).pluck().get()
     }
@@ -153,7 +150,7 @@ module.exports = class Moderation {
     }
 
     static async getUserGameWarnings(userId) {
-        return db.prepare(`SELECT game_warnings FROM users WHERE id='${userId}'`).pluck().get() || 0
+        return db.prepare(`SELECT game_warnings FROM users WHERE igid='${userId}'`).pluck().get() || 0
     }
 
     static async getUserChatKicks(userId) {
@@ -161,7 +158,7 @@ module.exports = class Moderation {
     }
 
     static async getUserGameKicks(userId) {
-        return db.prepare(`SELECT game_kicks FROM users WHERE id='${userId}'`).pluck().get() || 0
+        return db.prepare(`SELECT game_kicks FROM users WHERE igid='${userId}'`).pluck().get() || 0
     }
 
     static async getUserChatBans(userId) {
@@ -169,23 +166,12 @@ module.exports = class Moderation {
     }
 
     static async getUserGameBans(userId) {
-        return db.prepare(`SELECT game_bans FROM users WHERE id='${userId}'`).pluck().get() || 0
+        return db.prepare(`SELECT game_bans FROM users WHERE igid='${userId}'`).pluck().get() || 0
     }
 
     /*
      * Set Methods
      */
-    static async addStaff(igid, name, ign, chat_id, username, role) {
-        let staffData = db.prepare(`SELECT * FROM staff WHERE igid='${igid}'`).pluck().get()
-        if (!staffData) {
-            db.prepare(`INSERT INTO staff VALUES('${igid}', '${name}', '${ign}', '${chat_id}', '${username}', '${role}', 0, 0, 0)`).run()
-            return "Staff member added."
-        }
-        else {
-            return "Staff member already exists in the database."
-        }
-    }
-
     static async addPoints(userId, location, username, reason) {
         if (location == 'GAME') {
             let userData = db.prepare(`SELECT * FROM users WHERE igid='${userId}'`).pluck().get()
@@ -206,7 +192,7 @@ module.exports = class Moderation {
         }
     }
 
-    static async addLog(messageId, location, username, userId, staff, staffId, reason) {
+    static async addLog(messageId, location, username, userId, staff, staffId, reason, action="WARNING") {
         let date = new Date()
         let day = date.toDateString()
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
@@ -216,30 +202,29 @@ module.exports = class Moderation {
 
         await this.addPoints(userId, location, username, reason)
 
-        if (location == 'DISCORD') {
+        if (location == 'DISCORD'){
             action = await this.calculateAction(await this.getPoints(userId), await this.getWarnings(userId), await this.getKicks(userId), await this.getBans(userId))
         }
 
         let userLogNum = await this.getTotalUserLogAmount(userId) + 1
         let logId = await this.generateLogId() + 1
-
         if (action == 'WARNING' || action == 'WARNING_PERM_NEXT') { 
-            db.prepare(`UPDATE users SET warnings = ${await this.getUserChatWarnings(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`UPDATE users SET game_warnings = ${await this.getUsergameWarnings(userId) + 1} WHERE igid = '${userId}'`).run()
             db.prepare(`INSERT INTO warnings VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
         }
         if (action == 'KICK') { 
-            db.prepare(`UPDATE users SET kicks = ${await this.getUserChatKicks(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`UPDATE users SET game_kicks = ${await this.getUserGameKicks(userId) + 1} WHERE igid = '${userId}'`).run()
             db.prepare(`INSERT INTO kicks VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
         }
         if (action == 'BAN') { 
-            db.prepare(`UPDATE users SET bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`UPDATE users SET game_bans = ${await this.getUserGameBans(userId) + 1} WHERE igid = '${userId}'`).run()
             db.prepare(`INSERT INTO bans VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
         }
         if (action == 'PERM_BAN') { 
-            db.prepare(`UPDATE users SET bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`UPDATE users SET game_bans = ${await this.getUserGameBans(userId) + 1} WHERE igid = '${userId}'`).run()
             db.prepare(`INSERT INTO perm_bans VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
         }
-
+        
         db.prepare(`INSERT INTO logs VALUES(${logId}, '${location}', '${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
         db.prepare(`UPDATE users SET logs = ${userLogNum}`).run()
 

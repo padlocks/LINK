@@ -60,7 +60,7 @@ module.exports = class WarnCommand extends Command {
         let time = `${hours}:${minutes}`
         let datetime = `${day} @ ${time} (${config.timezone})`
 
-        let logId = await Moderation.getIncompleteLogId() + 1
+        let logId = await Moderation.generateLogId() + 1
         let logNum = await Moderation.getTotalUserLogAmount(member.user.id) + 1
 
         let embed = new RichEmbed
@@ -74,7 +74,7 @@ module.exports = class WarnCommand extends Command {
 
         member.guild.channels.get(config.log_channel).send(embed)
             .then(async (sentMessage) => {
-                await Moderation.addLog(sentMessage.id, member.user.tag, member.user.id, msg.author.tag, msg.author.id, reason)
+                await Moderation.addLog(sentMessage.id, 'DISCORD', member.user.tag, member.user.id, msg.author.tag, msg.author.id, reason)
                     .then(async (action) => {
                         let points = await Moderation.getPoints(member.user.id)
                         embed.fields.push({ name: 'Resulting Action', value: `${action}` })

@@ -1,3 +1,7 @@
+/*
+    initdb.js, creates data structure. Any database structure modifications happen here.
+*/
+
 var sqlite = require('sqlite3')
 var db = new sqlite.Database('tc.db')
 

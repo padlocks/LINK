@@ -3,16 +3,18 @@
   "version": "0.0.0",
   "description": "",
   "engines": {
-    "node": "12.0.0"
+    "node": "12.6.0"
   },
   "dependencies": {
     "anyid": "^1.0.1",
     "babel-eslint": "^8.1.2",
     "better-sqlite3": "^5.4.0",
+    "body-parser": "^1.19.0",
     "chalk": "^2.0.1",
     "cheerio": "^1.0.0-rc.2",
     "discord.js": "^11.2.1",
     "discord.js-commando": "^0.9.0",
+    "dotenv": "^8.2.0",
     "eslint": "^4.14.0",
     "express": "^4.17.1",
     "flatted": "^2.0.1",
@@ -35,7 +37,10 @@
   "scripts": {
     "start": "node ./src/bot.js",
     "fill": "node ./scripts/filldb.js",
-    "init": "node ./scripts/initdb.js"
+    "init": "node ./scripts/initdb.js",
+    "fillv2": "node ./scripts/filldb2.js",
+    "initv2": "node ./scripts/initdb2.js",
+    "web": "node ./src/web/Server.js"
   },
   "author": "Pascal Young",
   "private": true,
