@@ -1,7 +1,14 @@
 # True Colors Link Service
 A service which offers a simple link between ROBLOX services and Discord so all data and user information is united and easy to access. A product of the True Colors Development Team.
 
--atom#0001
+The initial goal of the LINK project was to create a more robust moderation system for TCA. The concepts and plans have changed since the initial unreleased project proposal from January 2018.
+>  LINK is the automation and simple interface of various tasks of the True Colors Administration. As the acronym describes, it links everything together into a single and easy to use interface through Discord bot commands and a website dedicated to the True Colors staff team. The network would branch into both the Discord and our ROBLOX game (Skylands) in order to unify our logging system into one place. The use of a bot connected to LINK would verify users and send potentially suspicious information to the staff team to investigate while also connecting Discord accounts to ROBLOX accounts making it easy for the administration to connect users and their actions from both Discord and the group games.
+ The website would include an improved appeal system which not only logs all appeals into a single place, but also helps keep the staff team focused on investigating the user using a Discord bot to message notifications, in #administration-chat and / or DMs, and website notifications. The entire goal of this project is to help create a more focused and structured administrative system.
+-- *TCA LINK Project Proposal, September 1, 2018, Pascal Young*
+
+After such a long wait, a lot of disscussion, unimaginable amounts of time and energy, the project is afloat and will be released Q1 of 2020 in the main True Colors group games. It may have taken 2 years, but for the product's success, this time has given us plenty of quality assurance tests and logistical problem solving time.
+
+- atom#0001
 
 ## Setup
 Setting up this project for production is fairly straight-forward, if you know about the system in place. There are "automatic" moderation systems in place, which are toggleable. However, if you are unsure about any random numbers in the config file, it may be best to leave it alone.
