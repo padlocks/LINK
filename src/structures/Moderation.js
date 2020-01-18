@@ -6,9 +6,7 @@
 */
 
 var Database = require('better-sqlite3')
-var config = require('../config.json')
-var db = new Database(config.dbFile, { fileMustExist: true })
-// There are multiple iteration of the database file, so we need to be able to change it dynamically.
+var db = new Database('tc2.db', { fileMustExist: true })
 
 module.exports = class Moderation {
     //* Containter for all database calls related to 'moderation' commands.
@@ -207,6 +205,7 @@ module.exports = class Moderation {
     }
 
     static async addLog(messageId, location, username, userId, staff, staffId, reason) {
+        let config = require('../../structures/Settings').load()
         let date = new Date()
         let day = date.toDateString()
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
@@ -217,7 +216,9 @@ module.exports = class Moderation {
         await this.addPoints(userId, location, username, reason)
 
         if (location == 'DISCORD') {
-            action = await this.calculateAction(await this.getPoints(userId), await this.getWarnings(userId), await this.getKicks(userId), await this.getBans(userId))
+            if (config.auto_moderate) {
+                action = await this.calculateAction(await this.getPoints(userId), await this.getWarnings(userId), await this.getKicks(userId), await this.getBans(userId))
+            }
         }
 
         let userLogNum = await this.getTotalUserLogAmount(userId) + 1
@@ -247,6 +248,7 @@ module.exports = class Moderation {
     }
 
     static async addEvidence(logId, location, evidenceURL) {
+        let config = require('../../structures/Settings').load()
         let date = new Date()
         let day = date.toDateString()
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
@@ -262,6 +264,7 @@ module.exports = class Moderation {
     }
 
     static async addComment(logId, staffUsername, staffId, comment) {
+        let config = require('../../structures/Settings').load()
         let date = new Date()
         let day = date.toDateString()
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
@@ -318,6 +321,8 @@ module.exports = class Moderation {
          * 
          * It should be easier to read if we had each possibility as it's own if statement.
         */
+
+        let config = require('../../structures/Settings').load()
 
         // User's violation is severe, perm ban.
         if (points >= 999) return 'PERM_BAN'

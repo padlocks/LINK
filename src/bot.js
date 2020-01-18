@@ -3,7 +3,7 @@ var { RichEmbed } = require('discord.js')
 var { oneLine } = require('common-tags')
 var path = require('path')
 var Logger = require('./utils/Logger.js')
-var config = require('./config.json')
+var config = require('./structures/Settings').load()
 
 var client = new CommandoClient({
     owner: config.dev,
@@ -22,11 +22,11 @@ client.on('error', Logger.error)
         })
         
         let embed = new RichEmbed
-        embed.setTitle('True Colors Auto-Moderation is Online')
+        embed.setTitle('True Colors Bot is Online')
         embed.setColor('#00FF00')
         embed.addField('Current Version', `${config.version}`)
-        if (config.enableExperiments) embed.setDescription('Experimental features are **ENABLED**')
-        embed.addField('Latest Changes', `${config.update_text}`)
+        if (config.experiments) embed.setDescription('Experimental features are **ENABLED**')
+        embed.addField('Latest Changes', `${config.patch_notes}`)
         embed.setFooter('Created by atom#0001 for the True Colors Administration')
         client.channels.get(config.startup_channel).send(embed)
     })

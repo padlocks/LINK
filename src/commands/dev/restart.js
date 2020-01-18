@@ -1,6 +1,4 @@
 var { Command } = require('discord.js-commando')
-var config = require('../../config.json')
-
 module.exports = class RestartCommand extends Command {
     constructor(client) {
         super(client, {
@@ -18,6 +16,8 @@ module.exports = class RestartCommand extends Command {
     }
 
     async run(msg) {
+        var config = require('../../structures/Settings').load()
+
         msg.channel.send('Restarting..')
             .then(() => this.client.destroy())
             .then(() => this.client.login(config.token))

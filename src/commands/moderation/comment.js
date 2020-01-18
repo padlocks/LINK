@@ -1,6 +1,4 @@
 var { Command } = require('discord.js-commando')
-var { RichEmbed } = require('discord.js')
-var config = require('../../config.json')
 var Moderation = require('../../structures/Moderation')
 
 module.exports = class CommentCommands extends Command {

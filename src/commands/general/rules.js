@@ -1,6 +1,5 @@
 var { Command } = require('discord.js-commando')
 var { RichEmbed } = require('discord.js')
-var config = require('../../config')
 var experimentsEnabled = require('../../utils/experimentsEnabled.js')
 
 module.exports = class RulesCommand extends Command {
@@ -20,6 +19,8 @@ module.exports = class RulesCommand extends Command {
     }
 
     async run(msg) {
+        var config = require('../../structures/Settings').load()
+
         let embed = new RichEmbed
         if (experimentsEnabled.check()) {
             embed.setColor('RANDOM')

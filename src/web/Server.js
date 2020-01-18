@@ -6,8 +6,7 @@
 let express = require('express')
 let app = express()
 let Database = require('better-sqlite3')
-let config = require('../config.json')
-let db = new Database(config.dbFile, { fileMustExist: true })
+let db = new Database('tc2.db', { fileMustExist: true })
 let bodyParser = require('body-parser')
 let GameAPI = require('../structures/Game')
 require('dotenv').config()
@@ -16,7 +15,8 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.post('/post/comments', async (req, res) => {
-    if (process.env.POSTKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.POSTKEY == req.body.key) {
         if (!req.body.logId || !req.body.staff || !req.body.suid, !req.body.msg) {
             // No data to add to database.
             return res.end(JSON.stringify({error: "Data is missing from your POST request's body. Make sure the following fields are set: logId, staff, suid, msg", success: false}))
@@ -33,7 +33,7 @@ app.post('/post/comments', async (req, res) => {
             res.end(JSON.stringify({error: err, success: false}))
         })
     } 
-    else if (process.env.WEBKEY == req.body.key) {
+    else if (config.WEBKEY == req.body.key) {
         res.end(JSON.stringify({error: "It seems you have GET access, however this is a POST request route. Permission rejected.", success: false}))
     }
     else {
@@ -42,7 +42,8 @@ app.post('/post/comments', async (req, res) => {
 })
 
 app.post('/post/evidence', async (req, res) => {
-    if (process.env.POSTKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.POSTKEY == req.body.key) {
         if (!req.body.logId || !req.body.url) {
             // No data to add to database.
             return res.end(JSON.stringify({error: "Data is missing from your POST request's body. Make sure the following fields are set: logId, url", success: false}))
@@ -58,7 +59,7 @@ app.post('/post/evidence', async (req, res) => {
             res.end(JSON.stringify({error: err, success: false}))
         })
     } 
-    else if (process.env.WEBKEY == req.body.key) {
+    else if (config.WEBKEY == req.body.key) {
         res.end(JSON.stringify({error: "It seems you have GET access, however this is a POST request route. Permission rejected.", success: false}))
     }
     else {
@@ -67,7 +68,8 @@ app.post('/post/evidence', async (req, res) => {
 })
 
 app.post('/post/logs', async (req, res) => {
-    if (process.env.POSTKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.POSTKEY == req.body.key) {
         if (!req.body.username || !req.body.guid || !req.body.staff || !req.body.suid || !req.body.action || !req.body.reason) {
             // No data to add to database.
             return res.end(JSON.stringify({error: "Data is missing from your POST request's body. Make sure the following fields are set: username, guid, staff, suid, action, reason", success: false}))
@@ -88,7 +90,7 @@ app.post('/post/logs', async (req, res) => {
             res.end(JSON.stringify({error: err, success: false}))
         })
     } 
-    else if (process.env.WEBKEY == req.body.key) {
+    else if (config.WEBKEY == req.body.key) {
         res.end(JSON.stringify({error: "It seems you have GET access, however this is a POST request route. Permission rejected.", success: false}))
     }
     else {
@@ -97,7 +99,8 @@ app.post('/post/logs', async (req, res) => {
 })
 
 app.get('/appeals', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM appeals`).all()
         res.end(JSON.stringify(obj))
     }
@@ -107,7 +110,8 @@ app.get('/appeals', (req, res) => {
 })
 
 app.get('/bans', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM bans`).all()
         res.end(JSON.stringify(obj))
     }
@@ -117,7 +121,8 @@ app.get('/bans', (req, res) => {
 })
 
 app.get('/comments', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM comments`).all()
         res.end(JSON.stringify(obj))
     }
@@ -127,7 +132,8 @@ app.get('/comments', (req, res) => {
 })
 
 app.get('/evidence', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM evidence`).all()
         res.end(JSON.stringify(obj))
     }
@@ -137,7 +143,8 @@ app.get('/evidence', (req, res) => {
 })
 
 app.get('/kicks', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM kicks`).all()
         res.end(JSON.stringify(obj))
     }
@@ -147,7 +154,8 @@ app.get('/kicks', (req, res) => {
 })
 
 app.get('/logs', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM logs`).all()
         res.end(JSON.stringify(obj))
     }
@@ -157,7 +165,8 @@ app.get('/logs', (req, res) => {
 })
 
 app.get('/permBans', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM perm_bans`).all()
         res.end(JSON.stringify(obj))
     }
@@ -167,7 +176,8 @@ app.get('/permBans', (req, res) => {
 })
 
 app.get('/reasons', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM reasons`).all()
         res.end(JSON.stringify(obj))
     }
@@ -177,7 +187,8 @@ app.get('/reasons', (req, res) => {
 })
 
 app.get('/staff', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM staff`).all()
         res.end(JSON.stringify(obj))
     }
@@ -187,7 +198,8 @@ app.get('/staff', (req, res) => {
 })
 
 app.get('/users', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM users`).all()
         res.end(JSON.stringify(obj))
     }
@@ -197,7 +209,8 @@ app.get('/users', (req, res) => {
 })
 
 app.get('/warnings', (req, res) => {
-    if (process.env.WEBKEY == req.body.key) {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
         let obj = db.prepare(`SELECT * FROM warnings`).all()
         res.end(JSON.stringify(obj))
     }

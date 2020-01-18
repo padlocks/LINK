@@ -1,6 +1,5 @@
 var { Command } = require('discord.js-commando')
 var { RichEmbed } = require('discord.js')
-var config = require('../../config')
 var spacetime = require('spacetime')
 var informal = require('../../utils/spacetime-informal')
 
@@ -34,6 +33,8 @@ module.exports = class ConvertCommand extends Command {
     }
 
     async run(msg, { time, convertTo }) {
+        var config = require('../../structures/Settings').load()
+
         convertTo = convertTo.toLowerCase()
 
         let defaultTime = spacetime.now(informal.find(config.default_tz.toLowerCase()))

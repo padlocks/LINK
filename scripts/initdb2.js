@@ -22,6 +22,9 @@
     * Created staff table to connect game and chat staff identification.
         ? This will be fully implemented later on along with appeals and updates to commenting and such.
         ? Similar to registering chat and game identity connections for regular users, it is important to do the same for staff.
+    
+    * Created settings table for dynamic toggles and updates.
+    * Created dev_settings table for dynamic toggles and updates for dev previews.
 
 */
 
@@ -126,6 +129,30 @@ db.run(`CREATE TABLE staff (
     warn_credit INTEGER, 
     kick_credit INTEGER, 
     ban_credit INTEGER
+    )`)
+
+db.run(`CREATE TABLE settings (
+    experiments INTEGER,
+    owner TEXT,
+    prefix TEXT,
+    token TEXT,
+    log_channel TEXT,
+    startup_channel TEXT,
+    rules_channel TEXT,
+    default_tz TEXT,
+    timezone TEXT,
+    WEBKEY TEXT,
+    POSTKEY TEXT,
+    auto_moderate INTEGER,
+    lowKick1Points INTEGER,
+    lowBan1Points INTEGER,
+    lowKick2Points INTEGER,
+    lowBan2Points INTEGER,
+    lowKick3Points INTEGER,
+    lowPermPoints INTEGER,
+    version TEXT,
+    rules TEXT,
+    patch_notes TEXT
     )`)
 
 db.close()

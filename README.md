@@ -13,6 +13,8 @@ After such a long wait, a lot of disscussion, unimaginable amounts of time and e
 ## Setup
 Setting up this project for production is fairly straight-forward, if you know about the system in place. There are "automatic" moderation systems in place, which are toggleable. However, if you are unsure about any random numbers in the config file, it may be best to leave it alone.
 
+**As of January 18, 2020**: a more elegant configuration system has been created allowing for dynamic config file changes. All configuration values have been moved to the database file under the settings table. *Changing values will require a database browser for SQLite files*.
+
  Requirements:
 - Discord Bot Token
 - Rules and startup dedicated channels.

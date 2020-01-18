@@ -1,7 +1,6 @@
 var { Command } = require('discord.js-commando')
 var { RichEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
-var config = require('../../config.json')
 var Moderation = require('../../structures/Moderation')
 
 module.exports = class WarnCommand extends Command {
@@ -34,6 +33,7 @@ module.exports = class WarnCommand extends Command {
     }
 
     async run(msg, { member, reason }) {
+        var config = require('../../structures/Settings').load()
 
         // confirm bot has proper permissions...
         let perms = []

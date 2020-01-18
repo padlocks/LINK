@@ -1,5 +1,4 @@
-var config = require('../config.json')
-
 module.exports.check = function () {
-    return config.enableExperiments
+    let config = require('../../structures/Settings').load()
+    return config.experiments
 }
