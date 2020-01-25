@@ -15,7 +15,7 @@ const db = new Database('tc2.db', { fileMustExist: true })
 module.exports = class Settings {
 
     static load () {
-        let configFile = require('../../config.json')
+        let configFile = require('../config.json') || configFile.dynamic == true
         if (configFile.dynamic) {
             let raw = db.prepare(`SELECT * FROM settings`).get()
 
@@ -26,13 +26,14 @@ module.exports = class Settings {
             })
 
             // Next, parse "toggles" JSON string.
-            JSON.parse(raw.toggles)
+            raw.toggles = JSON.parse(raw.toggles)
 
             return raw
         }
         else {
             return configFile
         }
+    
     }
 
     // Modify settings methods...
