@@ -12,15 +12,22 @@ var db = new Database('tc2.db', { fileMustExist: true })
 module.exports = class Settings {
 
     static load () {
-        let raw = db.prepare(`SELECT * FROM settings`).get()
+        let configFile = require('../../config.json')
+        if (!configFile.dynamic) {
 
-        // Since the db doesn't allow for boolean values, let's replace 1s and 0s with booleans.
-        Object.keys(raw).forEach(function(key){
-            if (raw[key] === 1) { raw[key] = true }
-            else if (raw[key] === 0) { raw[key] = false }
-        })
+            let raw = db.prepare(`SELECT * FROM settings`).get()
 
-        return raw
+            // Since the db doesn't allow for boolean values, let's replace 1s and 0s with booleans.
+            Object.keys(raw).forEach(function(key){
+                if (raw[key] === 1) { raw[key] = true }
+                else if (raw[key] === 0) { raw[key] = false }
+            })
+
+            return raw
+        }
+        else {
+            return configFile
+        }
     }
 
     // Modify settings methods...

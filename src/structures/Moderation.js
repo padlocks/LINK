@@ -15,6 +15,20 @@ module.exports = class Moderation {
      * Get Methods
      */
 
+    static async isLegacy(logId) {
+        // legacy is used to see if the log was from the old system.
+        let data = db.prepare(`SELECT legacy FROM logs WHERE id='${logId}'`).pluck().get()
+        if (data == 0) return false
+        if (data == 1) return true
+    }
+
+    static async isLegacyImported(userId) {
+        // legacy is used to see if the user was imported from the old system.
+        let data = db.prepare(`SELECT legacy_imported FROM users WHERE id='${userId}'`).pluck().get()
+        if (data == 0) return false
+        if (data == 1) return true
+    }
+
     static async generateLogId() {
         db.aggregate('max', {
             start: 0,
@@ -188,13 +202,13 @@ module.exports = class Moderation {
         if (location == 'GAME') {
             let userData = db.prepare(`SELECT * FROM users WHERE igid='${userId}'`).pluck().get()
             if (!userData) {
-                db.prepare(`INSERT INTO users VALUES('unknown', 'unknown', '${username}', '${userId}', 0, 0, 0, 0, 0, 0, 0, 0, 0)`).run()
+                db.prepare(`INSERT INTO users VALUES('unknown', 0, 'unknown', '${username}', '${userId}', 0, 0, 0, 0, 0, 0, 0, 0, 0)`).run()
             }
         }
         else {
             let userData = db.prepare(`SELECT * FROM users WHERE id='${userId}'`).pluck().get()
             if (!userData) {
-                db.prepare(`INSERT INTO users VALUES(${userId}, '${username}', 'unknown', 'unknown', 0, 0, 0, 0, 0, 0, 0, 0, 0)`).run()
+                db.prepare(`INSERT INTO users VALUES(${userId}, 0, '${username}', 'unknown', 'unknown', 0, 0, 0, 0, 0, 0, 0, 0, 0)`).run()
             }
 
             let userPoints = await this.getPoints(userId)
@@ -245,6 +259,41 @@ module.exports = class Moderation {
         db.prepare(`UPDATE users SET logs = ${userLogNum}`).run()
 
         return action
+    }
+
+    static async addUserLegacy(userId, username) {
+        let userData = db.prepare(`SELECT * FROM users WHERE id='${userId}'`).pluck().get()
+            if (!userData) {
+                db.prepare(`INSERT INTO users VALUES(${userId}, 1, '${username}', 'unknown', 'unknown', 0, 0, 0, 0, 0, 0, 0, 0, 0)`).run()
+            }
+    }
+
+    static async addLogLegacy(logId, location, datetime, messageId, username, userId, staff, staffId, reason, action) {
+        // addLog() with support for legacy content
+        await this.addUserLegacy(userId, username)
+
+        let userLogNum = await this.getTotalUserLogAmount(userId) + 1
+        action = action.toUpperCase()
+        
+        db.prepare(`INSERT INTO logs VALUES(${logId}, 1, ${location}, '${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
+        db.prepare(`UPDATE users SET logs = ${userLogNum}`).run()
+
+        if (action == 'WARNING' || action == 'WARNING_PERM_NEXT') { 
+            db.prepare(`UPDATE users SET warnings = ${await this.getUserChatWarnings(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO warnings VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
+        }
+        if (action == 'KICK') { 
+            db.prepare(`UPDATE users SET kicks = ${await this.getUserChatKicks(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO kicks VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
+        }
+        if (action == 'BAN') { 
+            db.prepare(`UPDATE users SET bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO bans VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
+        }
+        if (action == 'PERM_BAN' || action == 'GBAN') { 
+            db.prepare(`UPDATE users SET bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`INSERT INTO perm_bans VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
+        }
     }
 
     static async addEvidence(logId, location, evidenceURL) {

@@ -13,6 +13,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+discord-logs.json
+game-logs.json
+
 # Runtime data
 pids
 *.pid

@@ -5,11 +5,13 @@
 
     ? List of changes:
     ! - logs: added location text field. either discord or game.
+    !         added legacy integer field. 0 or 1, a boolean.
     ! - evidence: added location text field. either discord or game.
 
     ! - users: added ign, igid and gban_status text fields.
     !          renamed warnings, kicks, bans  text fields to chat_warnings, chat_kicks, chat_bans.
     !          added game_warnings, game_kicks, game_bans integer fields
+    !          added legacy integer field, 0 or 1, a boolean.
 
     ! - appeals: added status and location text field. 
         ? Incomplete feature at time of update.
@@ -38,6 +40,7 @@ db.run(`CREATE TABLE reasons (
 
 db.run(`CREATE TABLE logs (
     id INTEGER, 
+    legacy INTEGER,
     location TEXT, 
     time TEXT, 
     username TEXT, 
@@ -70,6 +73,7 @@ db.run(`CREATE TABLE comments (
 
 db.run(`CREATE TABLE users (
     id TEXT, 
+    legacy_imported INTEGER,
     username TEXT, 
     ign TEXT, 
     igid TEXT, 
