@@ -21,6 +21,15 @@ module.exports = class RulesCommand extends Command {
     async run(msg) {
         var config = require('../../structures/Settings').load()
 
+        if (!config.toggles.rulesCmd) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
+
         let embed = new RichEmbed
         if (experimentsEnabled.check()) {
             embed.setColor('RANDOM')

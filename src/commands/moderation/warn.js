@@ -35,6 +35,15 @@ module.exports = class WarnCommand extends Command {
     async run(msg, { member, reason }) {
         var config = require('../../structures/Settings').load()
 
+        if (!config.toggles.mCreateLogs) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
+
         // confirm bot has proper permissions...
         let perms = []
         if (!msg.guild.me.hasPermission('MANAGE_MESSAGES')) perms.push('MANAGE_MESSAGES')

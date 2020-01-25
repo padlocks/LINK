@@ -156,7 +156,9 @@ db.run(`CREATE TABLE settings (
     lowPermPoints INTEGER,
     version TEXT,
     rules TEXT,
-    patch_notes TEXT
+    patch_notes TEXT,
+    help_message TEXT,
+    toggles TEXT
     )`)
 
 db.close()

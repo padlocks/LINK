@@ -38,6 +38,16 @@ module.exports = class GameLogsCommand extends Command {
     }
 
     async run(msg, { userId, page }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.mViewGameLogs) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
         let warnings = await GameAPI.getUserGameWarnings(userId)
         let kicks = await GameAPI.getUserGameKicks(userId)
         let bans = await GameAPI.getUserGameBans(userId)

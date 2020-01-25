@@ -34,6 +34,17 @@ module.exports = class AddEvidenceCommand extends Command {
     }
 
     async run(msg, { logId, url }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.mAddEvidence) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
+
         // check if log even exists..
         let reason = await Moderation.getReason(logId)
         if (!reason) return msg.reply(`log with ID '${logId}' does not exist.`)

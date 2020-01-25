@@ -35,6 +35,16 @@ module.exports = class EvidenceCommand extends Command {
     }
 
     async run(msg, { member, page }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.mViewUserAttachments) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
         let evidence = await Moderation.getAllUserEvidence(member.user.id)
         if (evidence.length == 0) return msg.reply('this user has no evidence uploaded.')
 

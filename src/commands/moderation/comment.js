@@ -31,6 +31,16 @@ module.exports = class CommentCommands extends Command {
     }
 
     async run(msg, { logId, comment }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.mComment) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
         await Moderation.addComment(logId, msg.author.tag, msg.author.id, comment)
             .then(() => { return msg.react('\u2705') })
             .catch(err => { Logger.error(err) })

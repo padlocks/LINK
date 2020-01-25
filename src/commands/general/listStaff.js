@@ -29,7 +29,18 @@ module.exports = class ListStaffCommand extends Command {
         return msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
-    async run(msg, { logId, page }) {
+    async run(msg, { page }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.staffCmds) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
+
         let staffList = await Moderation.getAllStaff()
         let paginated = util.paginate(staffList, page, Math.floor(30))
 

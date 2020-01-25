@@ -38,6 +38,16 @@ module.exports = class LogsCommand extends Command {
     }
 
     async run(msg, { member, page }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.mViewUserStatus) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
         if (!member) {
             return msg.reply('invalid user!')
         }

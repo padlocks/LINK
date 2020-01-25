@@ -35,6 +35,15 @@ module.exports = class ConvertCommand extends Command {
     async run(msg, { time, convertTo }) {
         var config = require('../../structures/Settings').load()
 
+        if (!config.toggles.tzConvert) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
+
         convertTo = convertTo.toLowerCase()
 
         let defaultTime = spacetime.now(informal.find(config.default_tz.toLowerCase()))

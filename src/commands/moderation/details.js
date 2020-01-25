@@ -35,6 +35,16 @@ module.exports = class DetailsCommand extends Command {
     }
 
     async run(msg, { logId, page }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.mViewThread) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
         let staffId = await Moderation.getStaffResponsibleId(logId)
         let user = await Moderation.getUser(logId)
         let userId = await Moderation.getUserId(logId)

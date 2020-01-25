@@ -87,7 +87,23 @@ var s = {
     lowPermPoints: 34,
     version: '0.4.0',
     rules: "**1.** Do not spam. Spam is considered repeatedly sending images, posting lengthy and irrelevant message, posting long strings of messages (i.e. song lyrics, emoji spam), spam pinging (@ing) people/ranks, etc.\n\n**2.** Do not advertise other servers or groups without permission. This includes direct messaging members of this server advertisements without their consent.\n\n**3.** Inappropriate language, topics, and actions are not allowed. this includes:\n→**A.** Slurs, deliberate attempts to revoke negative reactions, pornography/adult conent, gore, offensive/hateful content in regards to race, gender identity, sexuality, etc., and graphic topics such as major genocides and school shootings.\n→**B.** Please refrain from making insensitive jokes, i.e. trigger jokes, insulting people by calling them 'autistic', etc.\n\n**4.** Do not post harmful content such as viruses, the glorification of harmful acts (i.e. self-harm, suicide), threats of IP tracking/DDoSing/Doxing, and malicious/illegal material.\n\n**5.** Respect and common decency is expected at all times. Do not mock, harass, or bully other members; this includes intentionally making people uncomfortable.\n\n**6.** Please do not be intentionally obnoxious, particularly in the voice channels. This includes playing loud audio, screaming, mic spamming, etc.\n\n**7.** True Colors is not an online dating platform; do not utilize the server as a platform for dating and/or hookups.\n\n**8.** Do not publicly post about moderation history. If you have a problem regarding moderation, please contact a member of the staff team.\n\nFor ROBLOX-related rules and an in-depth version of the guidelines, click [here](https://docs.google.com/document/d/1g1uASD3n5IIXwgiFRta4mnz0XK0WvRb6bLPXK53AbBw/edit?usp=sharing).",
-    patch_notes: '**0.4.0**:\n- Integrated dynamic settings. Settings may be changed without any system restarts.\n**0.3.0**:\n- Completed unification of gamedata and chatdata.\n'
+    patch_notes: '**0.4.0**:\n- Integrated dynamic settings. Settings may be changed without any system restarts.\n**0.3.0**:\n- Completed unification of gamedata and chatdata.\n',
+    help: "tbd",
+    toggles: JSON.stringify({
+        tzConvert: true,
+        staffCmds: false,
+        helpCmd: true,
+        rulesCmd: true,
+        versionCmd: true,
+        mAddEvidence: true,
+        mComment: true,
+        mViewThread: true,
+        mViewUserAttachments: true,
+        mViewGameLogs: true,
+        mViewLogAttachments: true,
+        mViewUserStatus: true,
+        mCreateLogs: true
+    })
 }
 
 db.run(`INSERT INTO settings VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, [s.experiments, s.owner, s.prefix, s.token, s.log_channel, s.startup_channel, s.rules_channel, s.default_tz, s.timezone, s.WEBKEY, s.POSTKEY, s.auto_moderate, s.lowKick1Points, s.lowBan1Points, s.lowKick2Points, s.lowBan2Points, s.lowKick3Points, s.lowPermPoints, s.version, s.rules, s.patch_notes])
