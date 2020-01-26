@@ -56,7 +56,7 @@ module.exports = class AddEvidenceCommand extends Command {
             if (msg.attachments.first()) {
                 evidence = msg.attachments.first().url
                 await Moderation.addEvidence(logId, 'DISCORD', evidence)
-                    .then(() => { return msg.react('\u2705') })
+                    .then(() => { return msg.react('✅') })
                     .catch(err => { Logger.error(err) })
             } else {
                 return msg.channel.send('No evidence supplied.')
@@ -65,7 +65,7 @@ module.exports = class AddEvidenceCommand extends Command {
         } else {
             urlChecker.verify(url, async () => {
                 await Moderation.addEvidence(logId, 'DISCORD', url)
-                    .then(() => { return msg.react('\u2705') })
+                    .then(() => { return msg.react('✅') })
                     .catch(err => { Logger.error(err) })
             })
         }

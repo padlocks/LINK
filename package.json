@@ -1,6 +1,6 @@
 {
-  "name": "tc-auto-mod",
-  "version": "0.0.0",
+  "name": "tc-link",
+  "version": "1.0.0",
   "description": "",
   "engines": {
     "node": "12.6.0"
@@ -44,5 +44,5 @@
   "author": "Pascal Young",
   "private": true,
   "main": "bot.js",
-  "repository": "https://gitlab.com/true-colors/automod.git"
+  "repository": "https://gitlab.com/true-colors/link.git"
 }

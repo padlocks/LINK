@@ -52,11 +52,11 @@ module.exports = class WarnCommand extends Command {
 
         if (perms.length > 0) return msg.reply(`I require the additional following permissions to use this command: ${perms}`)
         if (!member) {
-            msg.react('\u2612')
+            msg.react('❌')
             return msg.reply('invalid user!')
         }
         if (member === msg.member) {
-            msg.react('\u2612')
+            msg.react('❌')
             return msg.reply('you cannot warn yourself!')
         }
 
@@ -88,7 +88,7 @@ module.exports = class WarnCommand extends Command {
                         let points = await Moderation.getPoints(member.user.id)
                         embed.fields.push({ name: 'Resulting Action', value: `${action}` })
                         embed.fields.push({ name: 'Total User Points', value: `${points}` })
-                        embed.setFooter(`\u2713 ${datetime}`)
+                        embed.setFooter(`🗸 ${datetime}`)
                         if (action == 'WARNING') { 
                             if (!member.user.bot) {
                                 member.send(`You have received a warning for \`${reason}\`. Please be more mindful next time.\nRules can be found here: <#${config.rules_channel}>\n\n- True Colors Administration`)
@@ -123,7 +123,7 @@ module.exports = class WarnCommand extends Command {
                         Logger.error(err)
                     })
                 sentMessage.edit(embed).then(() => {
-                    msg.react('\u2705')
+                    msg.react('✅')
                 })
             })
             .catch(console.error)

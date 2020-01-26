@@ -42,7 +42,7 @@ module.exports = class CommentCommands extends Command {
             return msg.channel.send(embed)
         } 
         await Moderation.addComment(logId, msg.author.tag, msg.author.id, comment)
-            .then(() => { return msg.react('\u2705') })
+            .then(() => { return msg.react('✅') })
             .catch(err => { Logger.error(err) })
     }
 }

@@ -187,6 +187,13 @@ module.exports = class Moderation {
     /*
      * Set Methods
      */
+    static async editLogAction(logId, action) {
+        if (!db.prepare(`SELECT * from logs WHERE id='${logId}'`).pluck().get()) return false
+
+        db.prepare(`UPDATE logs SET action='${action}' WHERE id='${logId}'`).run()
+        return db.prepare(`SELECT * from logs WHERE id='${logId}'`).all()
+    }
+
     static async addStaff(igid, name, ign, chat_id, username, role) {
         let staffData = db.prepare(`SELECT * FROM staff WHERE igid='${igid}'`).pluck().get()
         if (!staffData) {
@@ -219,43 +226,42 @@ module.exports = class Moderation {
     }
 
     static async addLog(messageId, location, username, userId, staff, staffId, reason) {
-        let config = require('../../structures/Settings').load()
+        let config = require('./Settings').load()
         let date = new Date()
         let day = date.toDateString()
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
         let hours = (date.getHours() < 10 ? "0" : "") + date.getHours()
         let time = `${hours}:${minutes}`
         let datetime = `${day} @ ${time} (${config.timezone})`
+        let action
 
         await this.addPoints(userId, location, username, reason)
 
         if (location == 'DISCORD') {
-            if (config.auto_moderate) {
-                action = await this.calculateAction(await this.getPoints(userId), await this.getWarnings(userId), await this.getKicks(userId), await this.getBans(userId))
-            }
+            action = await this.calculateAction(await this.getPoints(userId), await this.getUserChatWarnings(userId), await this.getUserChatKicks(userId), await this.getUserChatBans(userId))
         }
 
         let userLogNum = await this.getTotalUserLogAmount(userId) + 1
         let logId = await this.generateLogId() + 1
 
         if (action == 'WARNING' || action == 'WARNING_PERM_NEXT') { 
-            db.prepare(`UPDATE users SET warnings = ${await this.getUserChatWarnings(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`UPDATE users SET chat_warnings = ${await this.getUserChatWarnings(userId) + 1} WHERE id = '${userId}'`).run()
             db.prepare(`INSERT INTO warnings VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
         }
         if (action == 'KICK') { 
-            db.prepare(`UPDATE users SET kicks = ${await this.getUserChatKicks(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`UPDATE users SET chat_kicks = ${await this.getUserChatKicks(userId) + 1} WHERE id = '${userId}'`).run()
             db.prepare(`INSERT INTO kicks VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
         }
         if (action == 'BAN') { 
-            db.prepare(`UPDATE users SET bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`UPDATE users SET chat_bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
             db.prepare(`INSERT INTO bans VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
         }
         if (action == 'PERM_BAN') { 
-            db.prepare(`UPDATE users SET bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
+            db.prepare(`UPDATE users SET chat_bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
             db.prepare(`INSERT INTO perm_bans VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
         }
 
-        db.prepare(`INSERT INTO logs VALUES(${logId}, '${location}', '${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
+        db.prepare(`INSERT INTO logs VALUES(${logId}, 0, '${location}', '${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
         db.prepare(`UPDATE users SET logs = ${userLogNum}`).run()
 
         return action
@@ -297,7 +303,7 @@ module.exports = class Moderation {
     }
 
     static async addEvidence(logId, location, evidenceURL) {
-        let config = require('../../structures/Settings').load()
+        let config = require('./Settings').load()
         let date = new Date()
         let day = date.toDateString()
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
@@ -313,7 +319,7 @@ module.exports = class Moderation {
     }
 
     static async addComment(logId, staffUsername, staffId, comment) {
-        let config = require('../../structures/Settings').load()
+        let config = require('./Settings').load()
         let date = new Date()
         let day = date.toDateString()
         let minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
@@ -371,7 +377,8 @@ module.exports = class Moderation {
          * It should be easier to read if we had each possibility as it's own if statement.
         */
 
-        let config = require('../../structures/Settings').load()
+        let config = require('./Settings').load()
+        if (!config.auto_moderate) return 'WARNING' // auto moderation disabled, return default action
 
         // User's violation is severe, perm ban.
         if (points >= 999) return 'PERM_BAN'

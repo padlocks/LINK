@@ -90,6 +90,7 @@ var s = {
     patch_notes: '**0.4.0**:\n- Integrated dynamic settings. Settings may be changed without any system restarts.\n**0.3.0**:\n- Completed unification of gamedata and chatdata.\n',
     help_message: "tbd",
     toggles: JSON.stringify({
+        startupMessage:true,
         tzConvert: true,
         staffCmds: false,
         helpCmd: true,
@@ -102,7 +103,9 @@ var s = {
         mViewGameLogs: true,
         mViewLogAttachments: true,
         mViewUserStatus: true,
-        mCreateLogs: true
+        mCreateLogs: true,
+        notify: false,
+        nChannel: ""
     })
 }
 

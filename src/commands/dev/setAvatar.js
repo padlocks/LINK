@@ -29,7 +29,7 @@ module.exports = class SetAvatarCommand extends Command {
 
     async run(msg, { imgURL }) {
         msg.author.client.user.setAvatar(imgURL)
-            .then(() => msg.react('\u2705'))
+            .then(() => msg.react('✅'))
             .catch(Logger.error)
     }
 }
