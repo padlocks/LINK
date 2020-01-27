@@ -56,6 +56,9 @@ module.exports = class EditActionCommand extends Command {
 
         let log = await Moderation.editLogAction(logId, action)
         log = log[0]
+        if (!log.user_id) {
+            return msg.reply('that logId does not exist.')
+        }
         let points = await Moderation.getPoints(log.user_id)
 
         let embed = new RichEmbed

@@ -206,6 +206,7 @@ module.exports = class Moderation {
     }
 
     static async addPoints(userId, location, username, reason) {
+        let config = require('./Settings').load()
         if (location == 'GAME') {
             let userData = db.prepare(`SELECT * FROM users WHERE igid='${userId}'`).pluck().get()
             if (!userData) {
@@ -218,10 +219,12 @@ module.exports = class Moderation {
                 db.prepare(`INSERT INTO users VALUES(${userId}, 0, '${username}', 'unknown', 'unknown', 0, 0, 0, 0, 0, 0, 0, 0, 0)`).run()
             }
 
-            let userPoints = await this.getPoints(userId)
-            let newPoints = await this.getReasonValue(reason)
-    
-            db.prepare(`UPDATE users SET points = ${userPoints + newPoints} WHERE id = '${userId}'`).run()
+            if (config.auto_moderate) {
+                let userPoints = await this.getPoints(userId)
+                let newPoints = await this.getReasonValue(reason)
+
+                db.prepare(`UPDATE users SET points = ${userPoints + newPoints} WHERE id = '${userId}'`).run()
+            }            
         }
     }
 

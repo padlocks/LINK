@@ -53,9 +53,9 @@ module.exports = class LogsCommand extends Command {
             return msg.reply('invalid user!')
         }
 
-        let warnings = await Moderation.getWarnings(member.user.id)
-        let kicks = await Moderation.getKicks(member.user.id)
-        let bans = await Moderation.getBans(member.user.id)
+        let warnings = await Moderation.getUserChatWarnings(member.user.id)
+        let kicks = await Moderation.getUserChatKicks(member.user.id)
+        let bans = await Moderation.getUserChatBans(member.user.id)
         let totalLogs = await Moderation.getTotalUserLogAmount(member.user.id)
         let points = await Moderation.getPoints(member.user.id)
         let logs = await Moderation.getUserLogs(member.user.id)
