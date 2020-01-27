@@ -7,7 +7,7 @@ module.exports = class AddEvidenceCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'addevidence',
-            aliases: ['add'],
+            aliases: ['add','attach'],
             group: 'moderation',
             memberName: 'addevidence',
             description: 'Adds evidence to logs',
