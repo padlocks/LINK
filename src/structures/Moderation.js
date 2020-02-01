@@ -187,6 +187,24 @@ module.exports = class Moderation {
     /*
      * Set Methods
      */
+    static async removeLog(logId) {
+        let logData = db.prepare(`SELECT * from logs WHERE id='${logId}'`).all()[0]
+        if (!logData) return false
+
+        let userData = db.prepare(`SELECT * from users WHERE id='${logData['user_id']}'`).all()[0]
+        if (logData['action'] == 'WARNING') {
+            db.prepare(`UPDATE users SET chat_warnings=${userData['chat_warnings'] - 1}`).run()
+        } else if (logData['action'] == 'KICK') {
+            db.prepare(`UPDATE users SET kicks=${userData['chat_kicks'] - 1}`).run()
+        } else if (logData['action'] == 'BAN' || logData['action'] == 'PERM_BAN') {
+            db.prepare(`UPDATE users SET chat_bans=${userData['chat_bans'] - 1}`).run()
+        }
+        db.prepare(`UPDATE users SET logs=${userData['logs'] - 1}`).run()
+
+        db.prepare(`DELETE FROM logs WHERE id='${logId}'`).run()
+        return logData['log_message_id']
+    }
+
     static async editLogAction(logId, action) {
         if (!db.prepare(`SELECT * from logs WHERE id='${logId}'`).pluck().get()) return false
 

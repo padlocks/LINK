@@ -104,6 +104,7 @@ var s = {
         mViewLogAttachments: true,
         mViewUserStatus: true,
         mCreateLogs: true,
+        mDeleteLogs: true,
         notify: false,
         nChannel: ""
     })

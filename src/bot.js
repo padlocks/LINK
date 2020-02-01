@@ -76,7 +76,7 @@ client.on('error', Logger.error)
           embed.setTitle('Command Blocked')
           embed.setColor('RANDOM')
           embed.addField('User', `${msg.author.tag} (${msg.author.id})`)
-          embed.addField('Command', `${cmd.memberName.toUpperCase()}`)
+          embed.addField('Command', `${msg.command.memberName.toUpperCase()}`)
           embed.addField('Reason', `${reason}`)
           embed.setThumbnail(msg.author.displayAvatarURL)
 
