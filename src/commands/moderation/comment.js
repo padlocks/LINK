@@ -10,6 +10,7 @@ module.exports = class CommentCommands extends Command {
             memberName: 'comment',
             description: 'Adds comment to logs',
             guildOnly: true,
+            userPermissions: ['MANAGE_MESSAGES'],
 
             args: [
                 {
@@ -24,10 +25,6 @@ module.exports = class CommentCommands extends Command {
                 }
             ]
         })
-    }
-
-    hasPermission(msg) {
-        return msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
     async run(msg, { logId, comment }) {

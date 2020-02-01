@@ -8,9 +8,11 @@ module.exports = class DeleteLogCommand extends Command {
             name: 'deletelog',
             aliases: ['delete', 'rm', 'remove'],
             group: 'moderation',
-            memberName: 'deletelog',
+            memberName: 'delete_log',
             description: 'Deletes a log entry.',
             guildOnly: true,
+            clientPermissions: ['MANAGE_MESSAGES'],
+            userPermissions: ['MANAGE_MESSAGES'],
 
             args: [
                 {
@@ -22,11 +24,12 @@ module.exports = class DeleteLogCommand extends Command {
         })
     }
 
-    hasPermission(msg) {
-        return msg.member.roles.find(role => role.name === "Human Resources")
-    }
-
     async run(msg, { logId }) {
+        if (!msg.member.roles.find(role => role.name === "Human Resources")) {
+            msg.reply('you are not a Human Resources Department member!')
+            msg.react('❌')
+            return
+        }
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.mDeleteLogs) {
@@ -37,12 +40,6 @@ module.exports = class DeleteLogCommand extends Command {
 
             return msg.channel.send(embed)
         }
-
-        // confirm bot has proper permissions...
-        let perms = []
-        if (!msg.guild.me.hasPermission('MANAGE_MESSAGES')) perms.push('MANAGE_MESSAGES')
-
-        if (perms.length > 0) return msg.reply(`I require the additional following permissions to use this command: ${perms}`)
 
         let log = await Moderation.removeLog(logId)
         if (log) {

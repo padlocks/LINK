@@ -10,7 +10,7 @@ module.exports = class ListStaffCommand extends Command {
             name: 'liststaff',
             aliases: ['liststaff', 'lstaff'],
             group: 'general',
-            memberName: 'liststaff',
+            memberName: 'list_staff',
             description: 'Displays all staff in the database.',
             guildOnly: true,
 

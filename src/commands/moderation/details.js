@@ -10,9 +10,10 @@ module.exports = class DetailsCommand extends Command {
             name: 'details',
             aliases: ['details', 'comments', 'thread'],
             group: 'moderation',
-            memberName: 'details',
+            memberName: 'view_details',
             description: 'Displays comments left by staff on a log.',
             guildOnly: true,
+            userPermissions: ['MANAGE_MESSAGES'],
 
             args: [
                 {
@@ -28,10 +29,6 @@ module.exports = class DetailsCommand extends Command {
                 }
             ]
         })
-    }
-
-    hasPermission(msg) {
-        return msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
     async run(msg, { logId, page }) {

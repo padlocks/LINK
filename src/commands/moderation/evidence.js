@@ -10,9 +10,10 @@ module.exports = class EvidenceCommand extends Command {
             name: 'evidence',
             aliases: ['evidence'],
             group: 'moderation',
-            memberName: 'evidence',
+            memberName: 'view_evidence',
             description: 'Displays evidence',
             guildOnly: true,
+            userPermissions: ['MANAGE_MESSAGES'],
 
             args: [
                 {
@@ -28,10 +29,6 @@ module.exports = class EvidenceCommand extends Command {
                 }
             ]
         })
-    }
-
-    hasPermission(msg) {
-        return msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
     async run(msg, { member, page }) {

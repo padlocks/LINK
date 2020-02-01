@@ -7,7 +7,7 @@ module.exports = class AddStaffCommand extends Command {
             name: 'addstaff',
             aliases: ['addstaff'],
             group: 'dev',
-            memberName: 'addstaff',
+            memberName: 'add_staff',
             description: 'Adds a staff member to the database.',
             guildOnly: false,
             args: [

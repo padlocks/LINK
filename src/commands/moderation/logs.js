@@ -9,9 +9,10 @@ module.exports = class LogsCommand extends Command {
             name: 'logs',
             aliases: ['logs', 'status'],
             group: 'moderation',
-            memberName: 'logs',
+            memberName: 'view_logs',
             description: 'Returns the moderation logs of a user.',
             guildOnly: true,
+            userPermissions: ['MANAGE_MESSAGES'],
             throttling: {
                 usages: 2,
                 duration: 3
@@ -31,10 +32,6 @@ module.exports = class LogsCommand extends Command {
                 }
             ]
         })
-    }
-
-    hasPermission(msg) {
-        return this.client.isOwner(msg.author) || msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
     async run(msg, { member, page }) {

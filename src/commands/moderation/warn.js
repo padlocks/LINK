@@ -9,9 +9,11 @@ module.exports = class WarnCommand extends Command {
             name: 'warn',
             aliases: ['warn', 'log'],
             group: 'moderation',
-            memberName: 'warn',
+            memberName: 'create_log',
             description: 'Warns a user',
             guildOnly: true,
+            clientPermissions: ['MANAGE_MESSAGES', 'KICK_MEMBERS', 'BAN_MEMBERS'],
+            userPermissions: ['MANAGE_MESSAGES'],
 
             args: [
                 {
@@ -28,10 +30,6 @@ module.exports = class WarnCommand extends Command {
         })
     }
 
-    hasPermission(msg) {
-        return msg.member.hasPermission('MANAGE_MESSAGES')
-    }
-
     async run(msg, { member, reason }) {
         var config = require('../../structures/Settings').load()
 
@@ -44,13 +42,6 @@ module.exports = class WarnCommand extends Command {
             return msg.channel.send(embed)
         } 
 
-        // confirm bot has proper permissions...
-        let perms = []
-        if (!msg.guild.me.hasPermission('MANAGE_MESSAGES')) perms.push('MANAGE_MESSAGES')
-        if (!msg.guild.me.hasPermission('KICK_MEMBERS')) perms.push('KICK_MEMBERS')
-        if (!msg.guild.me.hasPermission('BAN_MEMBERS')) perms.push('BAN_MEMBERS')
-
-        if (perms.length > 0) return msg.reply(`I require the additional following permissions to use this command: ${perms}`)
         if (!member) {
             msg.react('❌')
             return msg.reply('invalid user!')

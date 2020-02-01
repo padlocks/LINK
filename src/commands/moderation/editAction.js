@@ -9,9 +9,10 @@ module.exports = class EditActionCommand extends Command {
             name: 'editaction',
             aliases: ['editaction', 'action'],
             group: 'moderation',
-            memberName: 'editaction',
+            memberName: 'edit_action',
             description: 'Changes action field in a log.',
             guildOnly: true,
+            userPermissions: ['MANAGE_MESSAGES'],
 
             args: [
                 {
@@ -26,10 +27,6 @@ module.exports = class EditActionCommand extends Command {
                 }
             ]
         })
-    }
-
-    hasPermission(msg) {
-        return msg.member.hasPermission('MANAGE_MESSAGES')
     }
 
     async run(msg, { logId, action }) {
