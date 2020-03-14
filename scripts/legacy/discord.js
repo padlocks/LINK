@@ -37,6 +37,7 @@ async function getData(limit = 1000000) {
 
     fs.writeFile('discord-logs.json', data, (err) => {
         if (err) throw err;
-        console.log('Data written to file');
+        console.log('Legacy chat data written to file');
+        client.logout()
     });
 }

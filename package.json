@@ -39,7 +39,11 @@
     "init": "node ./scripts/initdb.js",
     "fillv2": "node ./scripts/filldb2.js",
     "initv2": "node ./scripts/initdb2.js",
-    "web": "node ./src/web/Server.js"
+    "web": "node ./src/web/Server.js",
+    "gen-legacy-chat": "node ./scripts/legacy/discord.js",
+    "gen-legacy-game": "node ./scripts/legacy/game.js",
+    "convert-legacy-chat": "node ./scripts/legacy/discordConvert.js",
+    "convert-legacy-game": "node ./scripts/legacy/gameConvert.js"
   },
   "author": "Pascal Young",
   "private": true,

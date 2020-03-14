@@ -36,6 +36,7 @@ async function getData(limit = 1000000) {
 
     fs.writeFile('game-logs.json', data, (err) => {
         if (err) throw err;
-        console.log('Data written to file');
+        console.log('Legacy game data written to file');
+        client.logout()
     });
 }
