@@ -1,5 +1,5 @@
 var { FriendlyError, CommandoClient } = require('discord.js-commando')
-var { RichEmbed } = require('discord.js')
+var { MessageEmbed } = require('discord.js')
 var { oneLine } = require('common-tags')
 var path = require('path')
 var Logger = require('./utils/Logger.js')
@@ -15,22 +15,18 @@ var client = new CommandoClient({
 client.on('error', Logger.error)
     .on('ready', () => {
         Logger.info(`[DISCORD]: client ready\nuser info: ${client.user.tag} id:${client.user.id}`)
-        client.user.setPresence({
-            game: {
-                name: 'with commands.'
-            }
-        })
+        client.user.setActivity('with commands.')
 
         let c = require('./structures/Settings').load()
         if (c.toggles.startupMessage) {
-            let embed = new RichEmbed
+            let embed = new MessageEmbed
             embed.setTitle('True Colors Bot is Online')
             embed.setColor('#00FF00')
             embed.addField('Current Version', `${config.version}`)
             if (config.experiments) embed.setDescription('Experimental features are **ENABLED**')
             embed.addField('Latest Changes', `${config.patch_notes}`)
             embed.setFooter('Created by atom#0001 for the True Colors Administration')
-            client.channels.get(config.startup_channel).send(embed)
+            client.channels.cache.get(config.startup_channel).send(embed)
         }
     })
     .on('disconnect', () => Logger.info('[DISCORD]: client disconnect'))
@@ -44,15 +40,15 @@ client.on('error', Logger.error)
         // audit
         let c = require('./structures/Settings').load()
         if (c.toggles.notify) {
-            let embed = new RichEmbed()
+            let embed = new MessageEmbed()
             embed.setTitle('Command Ran')
             embed.setColor('RANDOM')
             embed.addField('User', `${msg.author.tag} (${msg.author.id})`)
             embed.addField('Command', `${cmd.memberName.toUpperCase()}`)
             embed.addField('Arguments', `${Object.values(args).length ? `>> ${Object.values(args)}` : '' || '<none>'}`)
-            embed.setThumbnail(msg.author.displayAvatarURL)
+            embed.setThumbnail(msg.author.displayAvatarURL({dynamic: true}))
 
-            client.channels.get(c.toggles.nChannel).send(embed)
+            client.channels.cache.get(c.toggles.nChannel).send(embed)
         }
     })
     .on('message', async message => {
@@ -72,20 +68,20 @@ client.on('error', Logger.error)
       // audit
       let c = require('./structures/Settings').load()
       if (c.toggles.notify) {
-          let embed = new RichEmbed()
+          let embed = new MessageEmbed()
           embed.setTitle('Command Blocked')
           embed.setColor('RANDOM')
           embed.addField('User', `${msg.author.tag} (${msg.author.id})`)
           embed.addField('Command', `${msg.command.memberName.toUpperCase()}`)
           embed.addField('Reason', `${reason}`)
-          embed.setThumbnail(msg.author.displayAvatarURL)
+          embed.setThumbnail(msg.author.displayAvatarURL({ dynamic: true }))
 
-          client.channels.get(c.toggles.nChannel).send(embed)
+          client.channels.cache.get(c.toggles.nChannel).send(embed)
       }
     })
 
 client.on('warn', Logger.warn)
-    .on('reconnect', () => Logger.warn('[DISCORD]: client reconnecting..'))
+    .on('shardReconnecting', () => Logger.warn('[DISCORD]: client reconnecting..'))
 
 client.registry
     .registerGroups([

@@ -24,7 +24,7 @@ async function getData(limit = 1000000) {
             options.before = last_id;
         }
 
-        const messages = await client.channels.get(config.old_log_channel).fetchMessages(options);
+        const messages = await client.channels.cache.get(config.old_log_channel).fetchMessages(options);
 
         let x = await Moderation.generateLogId()
 

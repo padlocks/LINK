@@ -31,7 +31,7 @@ module.exports = class CommentCommands extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.mComment) {
-            let embed = new RichEmbed()
+            let embed = new MessageEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')

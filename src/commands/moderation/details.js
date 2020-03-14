@@ -1,6 +1,6 @@
 var { Command, util } = require('discord.js-commando')
 var { stripIndents } = require('common-tags')
-var { RichEmbed } = require('discord.js')
+var { MessageEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
 
@@ -35,7 +35,7 @@ module.exports = class DetailsCommand extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.mViewThread) {
-            let embed = new RichEmbed()
+            let embed = new MessageEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
@@ -51,7 +51,7 @@ module.exports = class DetailsCommand extends Command {
         let comments = await Moderation.getAllComments(logId)
         let paginated = util.paginate(comments, page, Math.floor(5))
 
-        let embed = new RichEmbed
+        let embed = new MessageEmbed
         embed.setAuthor(`Details of ${user} Log #${logNum}`)
         embed.setColor('RANDOM')
         embed.setFooter(`Staff Comments Page #${paginated.page} of ${paginated.maxPage}`)

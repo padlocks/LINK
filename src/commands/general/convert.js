@@ -1,5 +1,5 @@
 var { Command } = require('discord.js-commando')
-var { RichEmbed } = require('discord.js')
+var { MessageEmbed } = require('discord.js')
 var spacetime = require('spacetime')
 var informal = require('../../utils/spacetime-informal')
 
@@ -36,7 +36,7 @@ module.exports = class ConvertCommand extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.tzConvert) {
-            let embed = new RichEmbed()
+            let embed = new MessageEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
@@ -55,7 +55,7 @@ module.exports = class ConvertCommand extends Command {
             d = d.goto(informal.find(convertTo))
         }
 
-        let embed = new RichEmbed()
+        let embed = new MessageEmbed()
         embed.setTitle('Timezone Conversion')
         embed.setColor('RANDOM')
         embed.addField('UTC/GMT Time', time)

@@ -8,13 +8,13 @@ class Util {
             .replace(/@here/g, '@\u200Bhere')
             .replace(/<@&[0-9]+>/g, roles => {
                 var replaceID = roles.replace(/<|&|>|@/g, '')
-                var role = msg.channel.guild.roles.get(replaceID)
+                var role = msg.channel.guild.roles.cache.get(replaceID)
 
                 return `@${role.name}`
             })
             .replace(/<@!?[0-9]+>/g, user => {
                 var replaceID = user.replace(/<|!|>|@/g, '')
-                var member = msg.channel.guild.members.get(replaceID)
+                var member = msg.channel.guild.members.cache.get(replaceID)
 
                 return `@${member.user.username}`
             })

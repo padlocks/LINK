@@ -1,5 +1,5 @@
 var { Command } = require('discord.js-commando')
-var { RichEmbed } = require('discord.js')
+var { MessageEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
 
@@ -34,7 +34,7 @@ module.exports = class WarnCommand extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.mCreateLogs) {
-            let embed = new RichEmbed()
+            let embed = new MessageEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
@@ -63,7 +63,7 @@ module.exports = class WarnCommand extends Command {
         let logId = await Moderation.generateLogId() + 1
         let logNum = await Moderation.getTotalUserLogAmount(member.user.id) + 1
 
-        let embed = new RichEmbed
+        let embed = new MessageEmbed
         embed.setAuthor(`${member.user.tag} (${member.user.id}) | User Log #${logNum}`)
         embed.setDescription(`See evidence using '!logevidence ${logId}'\nAdd evidence using '!add' with an attachment.`)
         embed.setColor('#FF0000')
@@ -72,7 +72,7 @@ module.exports = class WarnCommand extends Command {
         embed.addField('Reason', `${reason}`)
         embed.setFooter(`${datetime}`)
 
-        member.guild.channels.get(config.log_channel).send(embed)
+        member.guild.channels.cache.get(config.log_channel).send(embed)
             .then(async (sentMessage) => {
                 await Moderation.addLog(sentMessage.id, 'DISCORD', member.user.tag, member.user.id, msg.author.tag, msg.author.id, reason)
                     .then(async (action) => {
@@ -99,13 +99,13 @@ module.exports = class WarnCommand extends Command {
                         if (action == 'BAN') { 
                             if (!member.user.bot) {
                                 member.send(`You have been banned for \`${reason}\`. [appeal info]\n\n- True Colors Administration`)
-                                member.ban(`Automatic ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                                member.guild.members.ban(member.id, { reason:`Automatic ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`})
                             }
                         }
                         if (action == 'PERM_BAN') { 
                             if (!member.user.bot) {
                                 member.send(`Due to a severe rule violations or recurring violations, you have been **permenately** banned for \`${reason}\`.\n\n- True Colors Administration`)
-                                member.ban(`Automatic perm ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`)
+                                member.guild.members.ban(member.id, {reason: `Automatic perm ban by ${msg.author.tag} for reason: ${reason}; user has ${logNum} logs and ${points} points`})
                             }
                         }
                     })

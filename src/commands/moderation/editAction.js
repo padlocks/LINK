@@ -1,5 +1,5 @@
 var { Command } = require('discord.js-commando')
-var { RichEmbed } = require('discord.js')
+var { MessageEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
 
@@ -33,7 +33,7 @@ module.exports = class EditActionCommand extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.mCreateLogs) {
-            let embed = new RichEmbed()
+            let embed = new MessageEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
@@ -58,7 +58,7 @@ module.exports = class EditActionCommand extends Command {
         }
         let points = await Moderation.getPoints(log.user_id)
 
-        let embed = new RichEmbed
+        let embed = new MessageEmbed
         embed.setAuthor(`${log.username} (${log.user_id}) | User Log #${log.user_log_num}`)
         embed.setDescription(`See evidence using '!logevidence ${logId}'\nAdd evidence using '!add' with an attachment.`)
         embed.setColor('#FF0000')
@@ -69,8 +69,8 @@ module.exports = class EditActionCommand extends Command {
         embed.addField('Total User Points',`${points}`)
         embed.setFooter(`🗸 ${log.time}`)
 
-        let logChannel = msg.guild.channels.get(config.log_channel)
-        logChannel.fetchMessage(log.log_message_id)
+        let logChannel = msg.guild.channels.cache.get(config.log_channel)
+        logChannel.fetch(log.log_message_id)
         .then(message => {
             message.edit(embed)
             .then(msg.react('✅'))
