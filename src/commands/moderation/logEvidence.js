@@ -1,6 +1,6 @@
 var { Command, util } = require('discord.js-commando')
 var { stripIndents } = require('common-tags')
-var { MessageEmbed } = require('discord.js')
+var { RichEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
 
@@ -35,7 +35,7 @@ module.exports = class LogEvidenceCommand extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.mViewLogAttachments) {
-            let embed = new MessageEmbed()
+            let embed = new RichEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
@@ -53,7 +53,7 @@ module.exports = class LogEvidenceCommand extends Command {
         let userLogNum = await Moderation.getUserLogNumber(userId)   
         let paginated = util.paginate(evidence, page, Math.floor(5)) // 5 pieces of evidence per page.
 
-        let embed = new MessageEmbed
+        let embed = new RichEmbed
         embed.setColor('RANDOM')
         embed.setTitle(`Evidence for LogID: ${logId}`)
         embed.setFooter(`Evidence Log Page #${paginated.page} of ${paginated.maxPage}`)

@@ -23,7 +23,7 @@ async function getData(limit = 1000000) {
             options.before = last_id;
         }
 
-        const messages = await client.channels.cache.get(config.game_logs).fetch(options);
+        const messages = await client.channels.get(config.game_logs).fetchMessages(options);
         sum_messages.push(...messages.array());
         last_id = messages.last().id;
 

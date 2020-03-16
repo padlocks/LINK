@@ -1,5 +1,5 @@
 var { Command } = require('discord.js-commando')
-var { MessageEmbed } = require('discord.js')
+var { RichEmbed } = require('discord.js')
 var Moderation = require('../../structures/Moderation')
 
 module.exports = class DeleteLogCommand extends Command {
@@ -25,7 +25,7 @@ module.exports = class DeleteLogCommand extends Command {
     }
 
     async run(msg, { logId }) {
-        if (!msg.member.roles.cache.find(role => role.name === 'Human Resources')) {
+        if (!msg.member.roles.find(role => role.name === "Human Resources")) {
             msg.reply('you are not a Human Resources Department member!')
             msg.react('❌')
             return
@@ -33,7 +33,7 @@ module.exports = class DeleteLogCommand extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.mDeleteLogs) {
-            let embed = new MessageEmbed()
+            let embed = new RichEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
@@ -43,8 +43,8 @@ module.exports = class DeleteLogCommand extends Command {
 
         let log = await Moderation.removeLog(logId)
         if (log) {
-            let logChannel = msg.guild.channels.cache.get(config.log_channel)
-            logChannel.fetch(log)
+            let logChannel = msg.guild.channels.get(config.log_channel)
+            logChannel.fetchMessage(log)
                 .then(message => {
                     message.delete()
                         .then(msg.react('✅'))

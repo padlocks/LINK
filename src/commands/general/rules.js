@@ -1,5 +1,5 @@
 var { Command } = require('discord.js-commando')
-var { MessageEmbed } = require('discord.js')
+var { RichEmbed } = require('discord.js')
 var experimentsEnabled = require('../../utils/experimentsEnabled.js')
 
 module.exports = class RulesCommand extends Command {
@@ -22,7 +22,7 @@ module.exports = class RulesCommand extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.rulesCmd) {
-            let embed = new MessageEmbed()
+            let embed = new RichEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
@@ -30,7 +30,7 @@ module.exports = class RulesCommand extends Command {
             return msg.channel.send(embed)
         } 
 
-        let embed = new MessageEmbed
+        let embed = new RichEmbed
         if (experimentsEnabled.check()) {
             embed.setColor('RANDOM')
             embed.setDescription(`${config.rules}`)

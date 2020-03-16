@@ -1,6 +1,6 @@
 var { Command } = require('discord.js-commando')
 var { stripIndents } = require('common-tags')
-var { MessageEmbed } = require('discord.js')
+var { RichEmbed } = require('discord.js')
 
 module.exports = class HelpCommand extends Command {
     constructor(client) {
@@ -22,7 +22,7 @@ module.exports = class HelpCommand extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.helpCmd) {
-            let embed = new MessageEmbed()
+            let embed = new RichEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
@@ -30,7 +30,7 @@ module.exports = class HelpCommand extends Command {
             return msg.channel.send(embed)
         } 
 
-        let embed = new MessageEmbed
+        let embed = new RichEmbed
         embed.setColor('RANDOM')
         embed.setAuthor('Command List')
         embed.setFooter(`Created by atom#0001 for the True Colors Administration`)
