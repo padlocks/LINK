@@ -1,6 +1,6 @@
 var { Command, util } = require('discord.js-commando')
 var { stripIndents } = require('common-tags')
-var { MessageEmbed } = require('discord.js')
+var { RichEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
 var GameAPI = require('../../structures/Game')
 module.exports = class GameLogsCommand extends Command {
@@ -38,7 +38,7 @@ module.exports = class GameLogsCommand extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.mViewGameLogs) {
-            let embed = new MessageEmbed()
+            let embed = new RichEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
@@ -52,7 +52,7 @@ module.exports = class GameLogsCommand extends Command {
         let points = await GameAPI.getPoints(userId)
         let logs = await GameAPI.getUserLogs(userId)
         let paginated = util.paginate(logs, page, Math.floor(5))
-        let embed = new MessageEmbed
+        let embed = new RichEmbed
         embed.setColor('RANDOM')
         embed.setAuthor(`Logs of ${await GameAPI.getIGNFromIGID(userId)} (${userId})`)
         embed.setFooter(`!evidence <member> | User Logs Page #${paginated.page} of ${paginated.maxPage}`)

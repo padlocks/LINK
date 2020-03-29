@@ -1,6 +1,6 @@
 var { Command, util } = require('discord.js-commando')
 var { stripIndents } = require('common-tags')
-var { MessageEmbed } = require('discord.js')
+var { RichEmbed } = require('discord.js')
 var Logger = require('../../utils/Logger.js')
 var Moderation = require('../../structures/Moderation')
 
@@ -35,7 +35,7 @@ module.exports = class EvidenceCommand extends Command {
         var config = require('../../structures/Settings').load()
 
         if (!config.toggles.mViewUserAttachments) {
-            let embed = new MessageEmbed()
+            let embed = new RichEmbed()
             embed.setTitle('Command Disabled!')
             embed.setColor('RANDOM')
             embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
@@ -46,7 +46,7 @@ module.exports = class EvidenceCommand extends Command {
         if (evidence.length == 0) return msg.reply('this user has no evidence uploaded.')
 
         let paginated = util.paginate(evidence, page, Math.floor(5)) // 5 pieces of evidence per page.
-        let embed = new MessageEmbed
+        let embed = new RichEmbed
         embed.setAuthor(`Evidence for ${member.user.tag} (${member.user.id})`)
         embed.setColor('RANDOM')
         embed.setFooter(`User Evidence Page #${paginated.page} of ${paginated.maxPage}`)
