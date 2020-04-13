@@ -246,7 +246,7 @@ module.exports = class Moderation {
         }
     }
 
-    static async addLog(messageId, location, username, userId, staff, staffId, reason) {
+    static async addLog(messageId, location, username, userId, staff, staffId, reason, points) {
         let config = require('./Settings').load()
         let date = new Date()
         let day = date.toDateString()
@@ -282,7 +282,7 @@ module.exports = class Moderation {
             db.prepare(`INSERT INTO perm_bans VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
         }
 
-        db.prepare(`INSERT INTO logs VALUES(${logId}, 0, '${location}', '${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', '${messageId}', '${action}', ${userLogNum})`).run()
+        db.prepare(`INSERT INTO logs VALUES(${logId}, 0, '${location}', '${datetime}', '${username}', '${userId}', '${staff}', '${staffId}', '${reason}', ${points}, '${messageId}', '${action}', ${userLogNum})`).run()
         db.prepare(`UPDATE users SET logs = ${userLogNum}`).run()
 
         return action

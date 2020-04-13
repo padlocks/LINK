@@ -85,9 +85,9 @@ var s = {
     lowBan2Points: 22,
     lowKick3Points: 28,
     lowPermPoints: 34,
-    version: '0.4.0',
+    version: '0.5.0',
     rules: "**1.** Do not spam. Spam is considered repeatedly sending images, posting lengthy and irrelevant message, posting long strings of messages (i.e. song lyrics, emoji spam), spam pinging (@ing) people/ranks, etc.\n\n**2.** Do not advertise other servers or groups without permission. This includes direct messaging members of this server advertisements without their consent.\n\n**3.** Inappropriate language, topics, and actions are not allowed. this includes:\n→**A.** Slurs, deliberate attempts to revoke negative reactions, pornography/adult conent, gore, offensive/hateful content in regards to race, gender identity, sexuality, etc., and graphic topics such as major genocides and school shootings.\n→**B.** Please refrain from making insensitive jokes, i.e. trigger jokes, insulting people by calling them 'autistic', etc.\n\n**4.** Do not post harmful content such as viruses, the glorification of harmful acts (i.e. self-harm, suicide), threats of IP tracking/DDoSing/Doxing, and malicious/illegal material.\n\n**5.** Respect and common decency is expected at all times. Do not mock, harass, or bully other members; this includes intentionally making people uncomfortable.\n\n**6.** Please do not be intentionally obnoxious, particularly in the voice channels. This includes playing loud audio, screaming, mic spamming, etc.\n\n**7.** True Colors is not an online dating platform; do not utilize the server as a platform for dating and/or hookups.\n\n**8.** Do not publicly post about moderation history. If you have a problem regarding moderation, please contact a member of the staff team.\n\nFor ROBLOX-related rules and an in-depth version of the guidelines, click [here](https://docs.google.com/document/d/1g1uASD3n5IIXwgiFRta4mnz0XK0WvRb6bLPXK53AbBw/edit?usp=sharing).",
-    patch_notes: '\n**0.4.2**:\n- Added `deleteLog` command (also `remove`,`rm`,`delete`) for HR department members.\n- Various bug fixes and performance improvements.\n**0.4.1**:\n- Audit logs are now available for every command ran. This will be expanded on in the future.\n- Many bug fixes for quality of life improvements.',
+    patch_notes: '\n**0.5.0**:\n - Upgraded auto-moderation system, introducing "points" given per log.\n - Introducing Legacy Log (BETA) support for importing.\n - Added an unban command.\n - Added a hotswap feature for debugging purposes.\n - General improvements preparing for future updates.\n- Added `deleteLog` command (also `remove`,`rm`,`delete`) for HR department members.\n- Various bug fixes and performance improvements.\n**0.4.1**:\n- Audit logs are now available for every command ran. This will be expanded on in the future.\n- Many bug fixes for quality of life improvements.',
     help_message: "tbd",
     toggles: JSON.stringify({
         startupMessage:true,
@@ -106,7 +106,9 @@ var s = {
         mCreateLogs: true,
         mDeleteLogs: true,
         notify: false,
-        nChannel: ""
+        nChannel: "",
+        mDeleteLogs: true,
+        autoAct: false
     })
 }
 

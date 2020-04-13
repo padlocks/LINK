@@ -47,7 +47,8 @@ db.run(`CREATE TABLE logs (
     user_id TEXT, 
     staff_username TEXT, 
     staff_id TEXT, 
-    reason TEXT, 
+    reason TEXT,
+    points INTEGER,
     log_message_id TEXT, 
     action TEXT, 
     user_log_num INTEGER
