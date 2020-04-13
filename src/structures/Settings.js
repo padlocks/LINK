@@ -7,6 +7,10 @@
 
     ? Default use-case: 
     ? let s = require('./structures/Settings.js').load()
+
+    * Hot-Swap Settings Tables
+    ? For multiple settings versions:
+    ? let s = require('./structures/Settings.js').load(1)
 */
 
 const Database = require('better-sqlite3')
@@ -14,10 +18,11 @@ const db = new Database('tc2.db', { fileMustExist: true })
 
 module.exports = class Settings {
 
-    static load () {
+    static load (version=1) {
+        // Version 1 is ALWAYS the production version.
         let configFile = require('../config.json') || configFile.dynamic == true
         if (configFile.dynamic) {
-            let raw = db.prepare(`SELECT * FROM settings`).get()
+            let raw = db.prepare(`SELECT * FROM settings WHERE version=${version}`).get()
 
             // Since the db doesn't allow for boolean values, let's replace 1s and 0s with booleans.
             Object.keys(raw).forEach(function(key){
@@ -240,6 +245,14 @@ module.exports = class Settings {
     static setNotifyChannel (newChannel) {
         let toggles = this.deserializeToggles()
         toggles.nChannel = newChannel
+
+        db.prepare(`UPDATE settings SET toggles=${this.serializeToggles(toggles)} WHERE rowid=1`).run()
+    }
+
+    static toggleAutoAct () {
+        let toggles = this.deserializeToggles()
+        if (toggles.mDeleteLogs) { toggles.autoAct = false }
+        else { toggles.autoAct = true }
 
         db.prepare(`UPDATE settings SET toggles=${this.serializeToggles(toggles)} WHERE rowid=1`).run()
     }

@@ -6,6 +6,7 @@
     ? List of changes:
     ! - logs: added location text field. either discord or game.
     !         added legacy integer field. 0 or 1, a boolean.
+    !         added points integer field. (4/13/2020)
     ! - evidence: added location text field. either discord or game.
 
     ! - users: added ign, igid and gban_status text fields.
@@ -137,6 +138,7 @@ db.run(`CREATE TABLE staff (
     )`)
 
 db.run(`CREATE TABLE settings (
+    version INTEGER PRIMARY KEY,
     experiments INTEGER,
     owner TEXT,
     prefix TEXT,
