@@ -138,7 +138,7 @@ db.run(`CREATE TABLE staff (
     )`)
 
 db.run(`CREATE TABLE settings (
-    version INTEGER PRIMARY KEY,
+    sv INTEGER AUTOINCREMENT PRIMARY KEY,
     experiments INTEGER,
     owner TEXT,
     prefix TEXT,
@@ -162,6 +162,10 @@ db.run(`CREATE TABLE settings (
     patch_notes TEXT,
     help_message TEXT,
     toggles TEXT
+    )`)
+
+db.run(`CREATE TABLE sv_loader (
+    sv INTEGER,
     )`)
 
 db.close()
