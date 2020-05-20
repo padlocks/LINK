@@ -180,6 +180,11 @@ local descs = {}
 	settings.Trello_AppKey = "";              -- Your Trello AppKey						  	Link: https://trello.com/app-key	
 	settings.Trello_Token = "";               -- Trello token (DON'T SHARE WITH ANYONE!)    Link: https://trello.com/1/connect?name=Trello_API_Module&response_type=token&expires=never&scope=read,write&key=YOUR_APP_KEY_HERE
 	
+	settings.Link_Enabled = true;  -- add descriptions later.
+	settings.Link_Server = "127.0.0.1:5000";
+	settings.Link_POSTKEY = "DEFAULT_KEY";
+	settings.Link_WEBKEY = "DEFAULT_KEY";
+
 	settings.G_API = true					-- If true allows other server scripts to access certain functions described in the API module through _G.Adonis
 	settings.G_Access = false				-- If enabled allows other scripts to access Adonis using _G.Adonis.Access; Scripts will still be able to do things like _G.Adonis.CheckAdmin(player)
 	settings.G_Access_Key = "Example_Key"	-- Key required to use the _G access API; Example_Key will not work for obvious reasons
