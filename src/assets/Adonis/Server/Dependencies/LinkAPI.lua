@@ -1,6 +1,10 @@
---	// FileName: LinkAPI.lua
---	// Written by: Audrey (pascaling, atom#0001)
---	// Description: An interface for the LINK service. To be used by new commands added via plugins.
+--[[ 
+	FileName: LinkAPI.lua
+	Written by: Audrey (pascaling, atom#0001)
+	Description: An interface for the LINK service. To be used by new commands added via plugins.
+
+   todo: allow for pub/sub events. implement in HTTP.lua. create command interface.
+]]--
 
 local http = game:service("HttpService")
 
@@ -122,17 +126,6 @@ function LINK(server, key)
 		getLogs = function()
 			return decode(request("GET", key, api.getUrl("logs")))
 		end;
-
-		--[[
-			messageId: 'N/A',
-            location: 'GAME',
-            username: req.body.username,
-            userId: req.body.guid,
-            staff: req.body.staff,
-            staffId: req.body.suid,
-            action: req.body.action,
-			reason: req.body.reason
-		]]
 
 		postLog = function (username, userId, staff, staffId, action, reason)
 			local data = {}
