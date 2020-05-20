@@ -10,7 +10,6 @@ let db = new Database('tc2.db', { fileMustExist: true })
 let bodyParser = require('body-parser')
 let GameAPI = require('../structures/Game')
 const { svGet } = require('../structures/Settings')
-require('dotenv').config()
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -262,7 +261,7 @@ app.get('/warnings', (req, res) => {
 
 app.get('/sv', (req, res) => {
     if (config.WEBKEY == req.body.key) {
-        res.end(await svGet())
+        res.end(svGet())
     }
     else {
          res.end(JSON.stringify({ error: "This route is protected. Permission rejected." }))
