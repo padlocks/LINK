@@ -172,6 +172,7 @@ local descs = {}
 	settings.BatchKey = "|"				-- :kill me | :ff bob | :explode scel
 	settings.ConsoleKeyCode = "Quote"	-- Keybind to open the console; Rebindable per player in userpanel; KeyCodes: http://wiki.roblox.com/index.php?title=API:Enum/KeyCode
 	
+	settings.TrelloEvents_Enabled = true;     -- Instead of waiting for HttpWait, every change made to a card will force an update.
 	settings.HttpWait = 60;					  -- How long things that use the HttpService will wait before updating again
 	settings.Trello_Enabled = false;		  -- Are the Trello features enabled?
 	settings.Trello_Primary = ""; 		      -- Primary Trello board
@@ -333,6 +334,7 @@ local descs = {}
 	descs.SongHint = [[ Display a hint with the current song name and ID when a song is played via :music ]]
 	
 	descs.AutoClean = [[ Will auto clean service.Workspace of things like hats and tools ]]
+	descs.AutoBackup = [[ Run a map backup command when the server starts, this usually can be false if the server is FE, which means exploits are mostly prevented to require :restoremap ]]
 	descs.AutoCleanDelay = [[ Time between auto cleans ]]
 	
 	descs.CustomChat = [[ Custom chat ]]

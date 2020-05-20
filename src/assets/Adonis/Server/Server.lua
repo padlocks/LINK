@@ -541,7 +541,19 @@ return service.NewProxy({__metatable = "Adonis"; __tostring = function() return 
 	
 	--// Trello updater
 	if server.Settings.Trello_Enabled then
-		service.StartLoop("TRELLO_UPDATER",server.Settings.HttpWait,server.HTTP.Trello.Update,true)
+		local T = server.HTTP.Trello
+		if server.Settings.TrelloEvents_Enabled then
+			local lists = T.getLists(server.Settings.Trello_Primary)
+			local banlist = T.getListObj(lists,{"Banlist","Ban List","Bans"})
+			local musiclist = T.getListObj(lists,{"Music","Music List","Tracks"})
+			 
+			T.CardAdded(banlist.id):connect(T.Update)
+			T.CardRemoved(banlist.id):connect(T.Update)
+			T.CardAdded(musiclist.id):connect(T.Update)
+			T.CardRemoved(musiclist.id):connect(T.Update)
+		else
+			service.StartLoop("TRELLO_UPDATER",server.Settings.HttpWait,T.Update,true)
+		end
 	end
 	
 	--// Load minor stuff

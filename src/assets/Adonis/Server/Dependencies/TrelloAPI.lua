@@ -6,7 +6,8 @@
 -- Token Link:   			 	https://trello.com/1/connect?name=Trello_API_Module&response_type=token&expires=never&scope=read,write&key=YOUR_APP_KEY_HERE     --
 --																																				  				 --
 -- Trello API module created by Sceleratis for use in Adonis & EISS. You can use this if you wish; I only ask that you give credit.						  		 --
--- This is currently a work in progress.																										  				 --
+-- This is currently a work in progress.	
+-- Trello onEvent services added by pascaling (atom#0001)																									  				 --
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -174,6 +175,133 @@ function Trello(appKey, token)
 				toks="?"..toks
 			end
 			return base..str..toks
+		end;
+		
+		-- Events
+		
+		--[[
+		EXAMPLE:
+			function cardAdded(card)
+				print(card.name)
+			end
+			local api=require(script.Parent.TrelloAPI) 
+			local boardid=api:GetBoardID("TestBoard")--The board id is different from the link you see when you go to a board 
+			local listid=api:GetListID("Testing",boardid) 
+			api.CardAdded(listid):connect(cardAdded)
+		
+		--]]
+		
+		CardAdded = function(ListID,RefreshTimeInSecs,initialIteration)
+			if RefreshTimeInSecs==nil or RefreshTimeInSecs<30 then
+				RefreshTimeInSecs=30
+			end
+			if initialIteration==nil then
+				initialIteration=false
+			end
+			local Hook={}
+			local callbackEnded=false
+			local previousTable={}
+			if not initialIteration then
+				previousTable=T:GetCardsInList(ListID)
+			end
+			local function refreshCallback(callback)
+				local newTable=T:GetCardsInList(ListID)
+				print("Is there something added?")
+				if (#newTable>#previousTable) then
+					print("Something added what is it...")
+					for _,i in next,newTable do
+						local found=false
+						for _,v in next,previousTable do
+							if (v.id==i.id) then
+								found=true
+							end
+						end  
+						if (not found) then
+							callback(i,ListID)
+						end
+					end
+				end
+				previousTable=newTable
+			end
+			local thread=nil
+			function Hook:connect(callback)
+				thread=coroutine.wrap(function(callbackEndedNested,callbackNested)
+					while ((not callbackEndedNested)) do			
+						local suc,msg = false,""
+						repeat
+							suc,msg=pcall(refreshCallback,callbackNested)
+						until suc
+						wait(RefreshTimeInSecs)
+					end
+				end)
+				thread(callbackEnded,callback)
+			end		
+			function Hook:disconnect()
+				callbackEnded=true
+				thread(callbackEnded,function()end)
+			end
+			return Hook
+		end;
+	
+		--[[
+			function cardRemoved(card)
+				print(card.name)
+			end
+			local api=require(script.Parent.TrelloAPI) 
+			local boardid=api:GetBoardID("TestBoard")--The board id is different from the link you see when you go to a board 
+			local listid=api:GetListID("Testing",boardid) 
+			api.CardRemoved(listid):connect(cardRemoved)	
+		--]]
+		CardRemoved = function (ListID,RefreshTimeInSecs,initialIteration)
+			if RefreshTimeInSecs==nil or RefreshTimeInSecs<30 then
+				RefreshTimeInSecs=30
+			end
+			if initialIteration==nil then
+				initialIteration=false
+			end
+			local Hook={}
+			local callbackEnded=false
+			local previousTable={}
+			if not initialIteration then
+				previousTable=T:GetCardsInList(ListID)
+			end
+			local function refreshCallback(callback)
+				local newTable=T:GetCardsInList(ListID)
+				print("Is there something added?")
+				if (#newTable<#previousTable) then
+					print("Something added what is it...")
+					for _,i in next,newTable do
+						local found=false
+						for _,v in next,previousTable do
+							if (v.id==i.id) then
+								found=true
+							end
+						end  
+						if (not found) then
+							callback(i,ListID)
+						end
+					end
+				end
+				previousTable=newTable
+			end
+			local thread=nil
+			function Hook:connect(callback)
+				thread=coroutine.wrap(function(callbackEndedNested,callbackNested)
+					while ((not callbackEndedNested)) do			
+						local suc,msg = false,""
+						repeat
+							suc,msg=pcall(refreshCallback,callbackNested)
+						until suc
+						wait(RefreshTimeInSecs)
+					end
+				end)
+				thread(callbackEnded,callback)
+			end		
+			function Hook:disconnect()
+				callbackEnded=true
+				thread(callbackEnded,function()end)
+			end
+			return Hook
 		end;
 	}	
 	return api
