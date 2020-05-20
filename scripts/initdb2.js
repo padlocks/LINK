@@ -115,7 +115,8 @@ db.run(`CREATE TABLE bans (
     location TEXT, 
     user_id TEXT, 
     username TEXT, 
-    time TEXT
+    time TEXT,
+    active INTEGER
     )`)
 
 db.run(`CREATE TABLE perm_bans (

@@ -187,6 +187,7 @@ module.exports = class Moderation {
     /*
      * Set Methods
      */
+
     static async removeLog(logId) {
         let logData = db.prepare(`SELECT * from logs WHERE id='${logId}'`).all()[0]
         if (!logData) return false
@@ -275,7 +276,7 @@ module.exports = class Moderation {
         }
         if (action == 'BAN') { 
             db.prepare(`UPDATE users SET chat_bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
-            db.prepare(`INSERT INTO bans VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
+            db.prepare(`INSERT INTO bans VALUES('${location}', ${userId}, '${username}', '${datetime}', 0)`).run()
         }
         if (action == 'PERM_BAN') { 
             db.prepare(`UPDATE users SET chat_bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
@@ -315,7 +316,7 @@ module.exports = class Moderation {
         }
         if (action == 'BAN') { 
             db.prepare(`UPDATE users SET bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
-            db.prepare(`INSERT INTO bans VALUES('${location}', ${userId}, '${username}', '${datetime}')`).run()
+            db.prepare(`INSERT INTO bans VALUES('${location}', ${userId}, '${username}', '${datetime}', 0)`).run()
         }
         if (action == 'PERM_BAN' || action == 'GBAN') { 
             db.prepare(`UPDATE users SET bans = ${await this.getUserChatBans(userId) + 1} WHERE id = '${userId}'`).run()
