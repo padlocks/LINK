@@ -3,7 +3,7 @@
 	Written by: Audrey (pascaling, atom#0001)
 	Description: An interface for the LINK service. To be used by new commands added via plugins.
 
-   todo: allow for pub/sub events. implement in HTTP.lua. create command interface.
+   todo: create command interface.
 ]]--
 
 local http = game:service("HttpService")
@@ -27,14 +27,13 @@ function urlEncode(str)
 	return http:UrlEncode(str)
 end
 
-function request(method, url, key)
+function request(method, url, body)
 	local request = {}
 	request.Method = method
 	request.Url = url
 	request.Headers = {}
 	request.Headers["Content-Type"] = "application/x-www-form-urlencoded"
-	request.Body = {}
-	request.Body.key = key
+	request.Body = body
 	
 	return http:RequuestAsync(request)
 end
@@ -54,7 +53,7 @@ end
 
 function LINK(server, key)
 	if not checkHttp() then
-		error("Could not connect to trello.com! Make sure HTTP is enabled.")
+		error("Could not connect to server! Make sure HTTP is enabled.")
 	end
 	
 	local api
@@ -85,15 +84,28 @@ function LINK(server, key)
 		end;
 		
 		getAppeals = function()
-			return decode(request("GET", key, api.getUrl("appeals")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("appeals"), data))
 		end;
 		
+		checkForBan = function(p)
+			local data = {}
+			data.key = key
+			data.userId = p
+			return request("GET", api.getUrl("checkban"), data)
+		end;
+
 		getBans = function()
-			return decode(request("GET", key, api.getUrl("bans")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("bans"), data))
 		end;
 		
 		getComments = function()
-			return decode(request("GET", key, api.getUrl("comments")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("comments"), data))
 		end;
 
 		postComment = function (logId, msg, staff, staffId)
@@ -107,7 +119,9 @@ function LINK(server, key)
 		end;
 		
 		getEvidence = function()
-			return decode(request("GET", key, api.getUrl("evidence")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("evidence"), data))
 		end;
 
 		postEvidence = function (logId, evidenceURL)
@@ -120,11 +134,15 @@ function LINK(server, key)
 		end;
 		
 		getKicks = function()
-			return decode(request("GET", key, api.getUrl("kicks")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("kicks"), data))
 		end;
 		
 		getLogs = function()
-			return decode(request("GET", key, api.getUrl("logs")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("logs"), data))
 		end;
 
 		postLog = function (username, userId, staff, staffId, action, reason)
@@ -142,27 +160,39 @@ function LINK(server, key)
 		end;
 		
 		getPermBans = function()
-			return decode(request("GET", key, api.getUrl("permbans")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("permbans"), data))
 		end;
 		
 		getReasons = function()
-			return decode(request("GET", key, api.getUrl("reasons")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("reasons"), data))
 		end;
 		
 		getStaff = function()
-			return decode(request("GET", key, api.getUrl("staff")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("staff"), data))
 		end;
 		
 		getUsers = function()
-			return decode(request("GET", key, api.getUrl("users")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("users"), data))
 		end;
 		
 		getWarnings = function()
-			return decode(request("GET", key, api.getUrl("warnings")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("warnings"), data))
 		end;
 
 		svGet = function()
-			return decode(request("GET", key, api.getUrl("sv")))
+			local data = {}
+			data.key = key
+			return decode(request("GET", api.getUrl("sv"), data))
 		end;
 
 		svSet = function (sv)

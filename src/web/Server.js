@@ -146,6 +146,19 @@ app.get('/bans', (req, res) => {
     }
 })
 
+app.get('/checkban', (req, res) => {
+    let config = require('../structures/Settings').load()
+    if (config.WEBKEY == req.body.key) {
+        if (!req.body.userId) return false
+        // the active field is only used for game bans.
+        let obj = db.prepare(`SELECT 1 FROM bans WHERE user_id=${userId} AND active=1`).all()
+        res.end(JSON.stringify(obj))
+    }
+    else {
+        res.end(JSON.stringify({ error: "This route is protected. Permission rejected." }))
+    }
+})
+
 app.get('/comments', (req, res) => {
     let config = require('../structures/Settings').load()
     if (config.WEBKEY == req.body.key) {

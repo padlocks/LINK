@@ -34,6 +34,9 @@ return function()
 			end)
 			if y and not n then return true end
 		end;
+
+		Link = require(script.Parent.Parent.Dependencies.LinkAPI).LINK(Settings.Link_Server, Settings.Link_WEBKEY);
+		LinkPost = require(script.Parent.Parent.Dependencies.LinkAPI).LINK(Settings.Link_Server, Settings.Link_POSTKEY);
 		
 		Trello = {
 			Helpers = {};

@@ -515,6 +515,7 @@ return function()
 		PlayerAdded = function(p)
 			if p.UserId < 0 and p.Name:match("^Guest ") and not service.RunService:IsStudio() then
 				p:Kick("Guest Account")
+				-- what is this, 2009?
 			else
 				local key = tostring(p.userId)
 				local keyData = {
