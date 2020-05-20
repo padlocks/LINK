@@ -548,6 +548,7 @@ return function()
 				local PlayerData = Core.GetPlayer(p)
 				local level = Admin.GetLevel(p)
 				local banned = Admin.CheckBan(p)
+				local antibotAlert = false -- integrate at a later time.
 				local removed = false
 				
 				--p:SetSpecial("Kick", Anti.RemovePlayer)
@@ -556,6 +557,11 @@ return function()
 				
 				if banned then 
 					p:Kick(Variables.BanMessage)
+					removed = true
+				end
+
+				if antibotAlert then 
+					p:Kick(Variables.BotKickMessage)
 					removed = true
 				end
 				

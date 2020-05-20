@@ -32,6 +32,7 @@ return function()
 		ScriptBuilder = {};
 		CachedDonors = {};
 		BanMessage = "Banned";
+		BotKickMessage = "Our anti-bot protection system has kicked you because of suspicious server mass-join behavior. If you believe this is an error, feel free to try again. No changes have been made to your account.";
 		LockMessage = "Not Whitelisted";
 		DonorPass = {1348327,1990427,1911740,167686,98593};
 		LightingSettings = {
