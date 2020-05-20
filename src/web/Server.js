@@ -9,6 +9,7 @@ let Database = require('better-sqlite3')
 let db = new Database('tc2.db', { fileMustExist: true })
 let bodyParser = require('body-parser')
 let GameAPI = require('../structures/Game')
+const { svGet } = require('../structures/Settings')
 require('dotenv').config()
 
 app.use(bodyParser.json())
@@ -98,6 +99,31 @@ app.post('/post/logs', async (req, res) => {
     }
 })
 
+app.post('/post/sv', async (req, res) => {
+    let Settings = require('../structures/Settings')
+    Settings.load()
+    if (config.POSTKEY == req.body.key) {
+        if (!req.body.logId || !req.body.url) {
+            // No data to add to database.
+            return res.end(JSON.stringify({ error: "Data is missing from your POST request's body. Make sure the following fields are set: logId, url", success: false }))
+        }
+        let obj = {
+            value: req.body.value,
+        }
+        await Settings.svModify(obj.value)
+            .then(res.end(JSON.stringify({ success: true, data: obj })))
+            .catch(err => {
+                res.end(JSON.stringify({ error: err, success: false }))
+            })
+    }
+    else if (config.WEBKEY == req.body.key) {
+        res.end(JSON.stringify({ error: "It seems you have GET access, however this is a POST request route. Permission rejected.", success: false }))
+    }
+    else {
+        res.end(JSON.stringify({ error: "This route is protected. Permission rejected.", success: false }))
+    }
+})
+
 app.get('/appeals', (req, res) => {
     let config = require('../structures/Settings').load()
     if (config.WEBKEY == req.body.key) {
@@ -175,6 +201,7 @@ app.get('/permBans', (req, res) => {
     }
 })
 
+// ! Please note the following will be depreciated soon.
 app.get('/reasons', (req, res) => {
     let config = require('../structures/Settings').load()
     if (config.WEBKEY == req.body.key) {
@@ -185,6 +212,7 @@ app.get('/reasons', (req, res) => {
         res.end(JSON.stringify({error: "This route is protected. Permission rejected."}))
     }
 })
+// !
 
 app.get('/staff', (req, res) => {
     let config = require('../structures/Settings').load()
@@ -216,6 +244,15 @@ app.get('/warnings', (req, res) => {
     }
     else {
         res.end(JSON.stringify({error: "This route is protected. Permission rejected."}))
+    }
+})
+
+app.get('/sv', (req, res) => {
+    if (config.WEBKEY == req.body.key) {
+        res.end(await svGet())
+    }
+    else {
+         res.end(JSON.stringify({ error: "This route is protected. Permission rejected." }))
     }
 })
 
