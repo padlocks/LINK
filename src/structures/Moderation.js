@@ -6,7 +6,7 @@
 */
 
 var Database = require('better-sqlite3')
-var db = new Database('tc2.db', { fileMustExist: true })
+var db = new Database('tc.db', { fileMustExist: true })
 
 module.exports = class Moderation {
     //* Containter for all database calls related to 'moderation' commands.

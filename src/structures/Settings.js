@@ -18,7 +18,7 @@
 */
 
 const Database = require('better-sqlite3')
-const db = new Database('tc2.db', { fileMustExist: true })
+const db = new Database('tc.db', { fileMustExist: true })
 
 module.exports = class Settings {
 

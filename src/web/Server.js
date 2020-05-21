@@ -6,7 +6,7 @@
 let express = require('express')
 let app = express()
 let Database = require('better-sqlite3')
-let db = new Database('tc2.db', { fileMustExist: true })
+let db = new Database('tc.db', { fileMustExist: true })
 let bodyParser = require('body-parser')
 let GameAPI = require('../structures/Game')
 const { svGet } = require('../structures/Settings')

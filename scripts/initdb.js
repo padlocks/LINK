@@ -32,7 +32,7 @@
 */
 
 var sqlite = require('sqlite3')
-var db = new sqlite.Database('tc.db') // tc2.db
+var db = new sqlite.Database('tc.db') // tc.db
 
 db.run(`CREATE TABLE reasons (
     reason TEXT, 
