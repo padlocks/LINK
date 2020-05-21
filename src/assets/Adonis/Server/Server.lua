@@ -432,13 +432,14 @@ return service.NewProxy({__metatable = "Adonis"; __tostring = function() return 
 	server.Core.Name = server.Functions:GetRandom()
 	server.Core.Themes = data.Themes or {}
 	server.Core.Plugins = data.Plugins or {}
-	server.Core.ModuleID = data.ModuleID or 359948692
-	server.Core.LoaderID = data.LoaderID or 360052698
+	server.Core.ModuleID = data.ModuleID or 5063442949
+	server.Core.LoaderID = data.LoaderID or 4569163075
 	server.Core.DebugMode = data.DebugMode or false
 	server.Core.DataStore = server.Core.GetDataStore()
 	server.Core.Loadstring = require(server.Deps.Loadstring)
 	server.HTTP.Trello.API = require(server.Deps.TrelloAPI)
-	
+	server.HTTP.Link = require(server.Deps.LinkAPI)
+
 	--// Bind cleanup
 	service.DataModel:BindToClose(CleanUp)
 	

@@ -147,11 +147,17 @@ app.get('/bans', (req, res) => {
 
 app.get('/checkban', (req, res) => {
     let config = require('../structures/Settings').load()
+    console.log('1')
     if (config.WEBKEY == req.body.key) {
+        console.log('2')
         if (!req.body.userId) return false
+        console.log('3')
         // the active field is only used for game bans.
+        let response
         let obj = db.prepare(`SELECT 1 FROM bans WHERE user_id=${userId} AND active=1`).all()
-        res.end(JSON.stringify(obj))
+        if (obj) { response = true } else { response = false }
+        console.log('4')
+        res.end(response)
     }
     else {
         res.end(JSON.stringify({ error: "This route is protected. Permission rejected." }))

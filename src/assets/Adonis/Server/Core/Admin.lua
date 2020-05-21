@@ -490,7 +490,11 @@ return function()
 			local doCheck = Admin.DoCheck
 			-- check for bans in LINK
 			if Settings.Link_Enabled then
-				return server.HTTP.Link.api.checkForBan(p.UserId)
+				local server = Settings.Link_Server
+				local key = Settings.Link_WEBKEY
+				local link = HTTP.Link(server, key)
+				
+				return link.checkForBan(p.UserId)
 			end
 			for ind,admin in next,Settings.Banned do
 				if doCheck(p,admin) then
