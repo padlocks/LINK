@@ -22,7 +22,7 @@ const db = new Database('tc.db', { fileMustExist: true })
 
 module.exports = class Settings {
 
-    load (version=0) {
+    static load (version=0) {
         // Version 1 is ALWAYS the production version.
         let configFile = require('../config.json') || configFile.dynamic == true
         if (configFile.dynamic) {
