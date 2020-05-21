@@ -2,6 +2,7 @@ return {
 	{Text = "Sceleratis/Davey_Bones",	Desc = "Made Adonis & EISS"};
 	{Text = "Kohltastrophe (Scripth)",	Desc = "For his help with various things and some code"};
 	{Text = "einsteinK",				Desc = "Helped me with some scripting problems early in development and put together the LoadstringParser; Best scripter I know"};
+	{Text = "atom#0001/pascaling",	    Desc = "Modified Adonis for True Colors specific usage (LINK.)"};
 	{Text = "Rerumu (Shining_Diamando)",Desc = "Made the endless stairs place\nRerubi (Bytecode Interpreter)\nParser\nSteampunk theme"};
 	{Text = "@GitHub MudockYatho", 				Desc = "GitHub Contributor"};	
 	{Text = "@GitHub TheCakeChicken", 			Desc = "GitHub Contributor"};

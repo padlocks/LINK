@@ -1,6 +1,11 @@
 return {
-	"Version: 168";
+	"Version: 168 (a1)";
 	"*Click and drag edges to expand*";
+	"";
+	"[05.20.2020 16:51 PST]";
+	"*LINK integration.";
+	"*Removed commands deemed inappropriate for modified usage.";
+	"audrey (atom#0001; pascaling) says hello!";
 	"";
 	"[05.12.2020 19:55 EST]";
 	"*Revived a popular command with new wording to adhere to ROBLOX's terms";
