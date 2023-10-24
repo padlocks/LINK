@@ -1,18 +1,19 @@
 {
-  "name": "tc-auto-mod",
-  "version": "0.0.0",
+  "name": "tc-link",
+  "version": "1.0.0",
   "description": "",
   "engines": {
-    "node": "12.0.0"
+    "node": "12.6.0"
   },
   "dependencies": {
     "anyid": "^1.0.1",
     "babel-eslint": "^8.1.2",
     "better-sqlite3": "^5.4.0",
+    "body-parser": "^1.19.0",
     "chalk": "^2.0.1",
     "cheerio": "^1.0.0-rc.2",
-    "discord.js": "^11.2.1",
-    "discord.js-commando": "^0.9.0",
+    "discord.js": "^11.6.3",
+    "discord.js-commando": "^0.10.0",
     "eslint": "^4.14.0",
     "express": "^4.17.1",
     "flatted": "^2.0.1",
@@ -35,10 +36,15 @@
   "scripts": {
     "start": "node ./src/bot.js",
     "fill": "node ./scripts/filldb.js",
-    "init": "node ./scripts/initdb.js"
+    "init": "node ./scripts/initdb.js",
+    "web": "node ./src/web/Server.js",
+    "gen-legacy-chat": "node ./scripts/legacy/discord.js",
+    "gen-legacy-game": "node ./scripts/legacy/game.js",
+    "convert-legacy-chat": "node ./scripts/legacy/discordConvert.js",
+    "convert-legacy-game": "node ./scripts/legacy/gameConvert.js"
   },
   "author": "Pascal Young",
   "private": true,
   "main": "bot.js",
-  "repository": "https://gitlab.com/true-colors/automod.git"
+  "repository": "https://gitlab.com/true-colors/link.git"
 }

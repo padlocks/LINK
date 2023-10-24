@@ -1,6 +1,4 @@
 var { Command } = require('discord.js-commando')
-var { RichEmbed } = require('discord.js')
-var config = require('../../config.json')
 var Moderation = require('../../structures/Moderation')
 
 module.exports = class CommentCommands extends Command {
@@ -12,6 +10,7 @@ module.exports = class CommentCommands extends Command {
             memberName: 'comment',
             description: 'Adds comment to logs',
             guildOnly: true,
+            userPermissions: ['MANAGE_MESSAGES'],
 
             args: [
                 {
@@ -28,13 +27,19 @@ module.exports = class CommentCommands extends Command {
         })
     }
 
-    hasPermission(msg) {
-        return msg.member.hasPermission('MANAGE_MESSAGES')
-    }
-
     async run(msg, { logId, comment }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.mComment) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
         await Moderation.addComment(logId, msg.author.tag, msg.author.id, comment)
-            .then(() => { return msg.react('\u2705') })
+            .then(() => { return msg.react('✅') })
             .catch(err => { Logger.error(err) })
     }
 }

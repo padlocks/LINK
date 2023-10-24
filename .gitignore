@@ -3,13 +3,18 @@
 .vscode/
 
 # Database Files
-tc.db
+test.db
 
 # Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+discord-logs.json
+game-logs.json
+discord-logs-1.json
+game-logs-1.json
 
 # Runtime data
 pids

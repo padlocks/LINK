@@ -10,9 +10,10 @@ module.exports = class LogEvidenceCommand extends Command {
             name: 'logevidence',
             aliases: ['logevidence'],
             group: 'moderation',
-            memberName: 'logevidence',
+            memberName: 'view_log_evidence',
             description: 'Displays evidence via logId',
             guildOnly: true,
+            userPermissions: ['MANAGE_MESSAGES'],
 
             args: [
                 {
@@ -30,11 +31,17 @@ module.exports = class LogEvidenceCommand extends Command {
         })
     }
 
-    hasPermission(msg) {
-        return msg.member.hasPermission('MANAGE_MESSAGES')
-    }
-
     async run(msg, { logId, page }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.mViewLogAttachments) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
         // check logId is valid:
         let reason = await Moderation.getReason(logId)
         if (!reason) return msg.reply(`log with ID '${logId}' does not exist.`)

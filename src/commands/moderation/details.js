@@ -10,9 +10,10 @@ module.exports = class DetailsCommand extends Command {
             name: 'details',
             aliases: ['details', 'comments', 'thread'],
             group: 'moderation',
-            memberName: 'details',
+            memberName: 'view_details',
             description: 'Displays comments left by staff on a log.',
             guildOnly: true,
+            userPermissions: ['MANAGE_MESSAGES'],
 
             args: [
                 {
@@ -30,11 +31,17 @@ module.exports = class DetailsCommand extends Command {
         })
     }
 
-    hasPermission(msg) {
-        return msg.member.hasPermission('MANAGE_MESSAGES')
-    }
-
     async run(msg, { logId, page }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.mViewThread) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
         let staffId = await Moderation.getStaffResponsibleId(logId)
         let user = await Moderation.getUser(logId)
         let userId = await Moderation.getUserId(logId)

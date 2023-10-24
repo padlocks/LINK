@@ -1,44 +1,31 @@
 var { Command } = require('discord.js-commando')
-var config = require('../../config.json')
+var Moderation = require('../../structures/Moderation')
 
-module.exports = class UnbanCommand extends Command {
+module.exports = class UnbanCommands extends Command {
     constructor(client) {
         super(client, {
             name: 'unban',
-            aliases: ['unban'],
+            aliases: ['unban', 'revoke'],
             group: 'moderation',
             memberName: 'unban',
-            description: 'Unbans a user',
+            description: 'Revokes a user\'s ban.',
             guildOnly: true,
-            throttling: {
-                usages: 2,
-                duration: 3
-            },
+            clientPermissions: ['BAN_MEMBERS'],
+            userPermissions: ['MANAGE_MESSAGES', 'BAN_MEMBERS'],
 
             args: [
                 {
-                    key: 'userId',
-                    prompt: 'Who would you like to ban?\n',
+                    key: 'id',
+                    prompt: 'What is the userId of the user you wish to unban?\n',
                     type: 'string'
                 }
             ]
         })
     }
 
-    hasPermission(msg) {
-        return this.client.isOwner(msg.author) || msg.member.hasPermission('BAN_MEMBERS')
-    }
-
-    async run(msg, { userId }) {
-        if (!userId) {
-            return msg.reply('invalid user!')
-        }
-        if (userId === msg.member.id) {
-            return
-        }
-        var user = await msg.author.client.fetchUser(userId)
-        user.unban().then(() => {
-            return msg.react('\u2705')
-        })
+    async run(msg, { id }) {
+        msg.channel.guild.unban(`${id}`)
+            .then(user => msg.reply(`${user.tag} has been unbanned.`))
+            .catch(console.error)
     }
 }

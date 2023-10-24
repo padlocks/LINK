@@ -1,22 +1,9 @@
-// ping glitch every 5 min, keep bot alive
-const http = require('http')
-const express = require('express')
-const app = express()
-app.get("/", (request, response) => {
-  console.log(Date.now() + " Ping Received")
-  response.sendStatus(200)
-});
-app.listen(process.env.PORT)
-setInterval(() => {
-  http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`)
-}, 280000)
-
 var { FriendlyError, CommandoClient } = require('discord.js-commando')
 var { RichEmbed } = require('discord.js')
 var { oneLine } = require('common-tags')
 var path = require('path')
 var Logger = require('./utils/Logger.js')
-var config = require('./config.json')
+var config = require('./structures/Settings').load()
 
 var client = new CommandoClient({
     owner: config.dev,
@@ -33,23 +20,41 @@ client.on('error', Logger.error)
                 name: 'with commands.'
             }
         })
-        
-        let embed = new RichEmbed
-        embed.setTitle('True Colors Auto-Moderation is Online')
-        embed.setColor('#00FF00')
-        embed.addField('Current Version', `${config.version}`)
-        embed.addField('Latest Changes', `${config.update_text}`)
-        embed.setFooter('Created by atom#0001 for the True Colors Administration')
-        client.channels.get(config.startup_channel).send(embed)
+
+        let c = require('./structures/Settings').load()
+        if (c.toggles.startupMessage) {
+            let embed = new RichEmbed
+            embed.setTitle('True Colors Bot is Online')
+            embed.setColor('#00FF00')
+            embed.addField('Current Version', `${config.version}`)
+            if (config.experiments) embed.setDescription('Experimental features are **ENABLED**')
+            embed.addField('Latest Changes', `${config.patch_notes}`)
+            embed.setFooter('Created by atom#0001 for the True Colors Administration')
+            client.channels.get(config.startup_channel).send(embed)
+        }
     })
     .on('disconnect', () => Logger.info('[DISCORD]: client disconnect'))
-    .on('commandRun', (cmd, promise, msg, args) =>
+    .on('commandRun', (cmd, promise, msg, args) => {
         Logger.info(oneLine`
         [COMMAND]: ${msg.author.tag} (${msg.author.id})
         > ${cmd.groupID}:${cmd.memberName}
         ${Object.values(args).length ? `>> ${Object.values(args)}` : ''}
         `)
-    )
+
+        // audit
+        let c = require('./structures/Settings').load()
+        if (c.toggles.notify) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Ran')
+            embed.setColor('RANDOM')
+            embed.addField('User', `${msg.author.tag} (${msg.author.id})`)
+            embed.addField('Command', `${cmd.memberName.toUpperCase()}`)
+            embed.addField('Arguments', `${Object.values(args).length ? `>> ${Object.values(args)}` : '' || '<none>'}`)
+            embed.setThumbnail(msg.author.displayAvatarURL)
+
+            client.channels.get(c.toggles.nChannel).send(embed)
+        }
+    })
     .on('message', async message => {
         if (message.channel.type === 'dm') return
         if (message.author.bot) return
@@ -64,6 +69,19 @@ client.on('error', Logger.error)
             > ${msg.command ? `${msg.command.groupID}:${msg.command.memberName}` : ''}
             User ${msg.author.tag} (${msg.author.id}): ${reason}
       `)
+      // audit
+      let c = require('./structures/Settings').load()
+      if (c.toggles.notify) {
+          let embed = new RichEmbed()
+          embed.setTitle('Command Blocked')
+          embed.setColor('RANDOM')
+          embed.addField('User', `${msg.author.tag} (${msg.author.id})`)
+          embed.addField('Command', `${msg.command.memberName.toUpperCase()}`)
+          embed.addField('Reason', `${reason}`)
+          embed.setThumbnail(msg.author.displayAvatarURL)
+
+          client.channels.get(c.toggles.nChannel).send(embed)
+      }
     })
 
 client.on('warn', Logger.warn)
@@ -75,7 +93,8 @@ client.registry
         ['dev', 'Developer'],
         ['moderation', 'Moderation']
     ])
-    .registerDefaults()
+    .registerDefaultTypes()
+    .registerDefaultGroups()
     .registerTypesIn(path.join(__dirname, 'types'))
     .registerCommandsIn(path.join(__dirname, 'commands'))
 

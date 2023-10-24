@@ -7,11 +7,12 @@ module.exports = class AddEvidenceCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'addevidence',
-            aliases: ['add'],
+            aliases: ['add','attach'],
             group: 'moderation',
-            memberName: 'addevidence',
+            memberName: 'add_evidence',
             description: 'Adds evidence to logs',
             guildOnly: true,
+            userPermissions: ['MANAGE_MESSAGES'],
 
             args: [
                 {
@@ -29,11 +30,18 @@ module.exports = class AddEvidenceCommand extends Command {
         })
     }
 
-    hasPermission(msg) {
-        return msg.member.hasPermission('MANAGE_MESSAGES')
-    }
-
     async run(msg, { logId, url }) {
+        var config = require('../../structures/Settings').load()
+
+        if (!config.toggles.mAddEvidence) {
+            let embed = new RichEmbed()
+            embed.setTitle('Command Disabled!')
+            embed.setColor('RANDOM')
+            embed.addField('Error', 'Command is disabled. Please contact the developer for support.')
+            
+            return msg.channel.send(embed)
+        } 
+
         // check if log even exists..
         let reason = await Moderation.getReason(logId)
         if (!reason) return msg.reply(`log with ID '${logId}' does not exist.`)
@@ -44,8 +52,8 @@ module.exports = class AddEvidenceCommand extends Command {
         if (url == 'NONE') {
             if (msg.attachments.first()) {
                 evidence = msg.attachments.first().url
-                await Moderation.addEvidence(logId, evidence)
-                    .then(() => { return msg.react('\u2705') })
+                await Moderation.addEvidence(logId, 'DISCORD', evidence)
+                    .then(() => { return msg.react('✅') })
                     .catch(err => { Logger.error(err) })
             } else {
                 return msg.channel.send('No evidence supplied.')
@@ -53,8 +61,8 @@ module.exports = class AddEvidenceCommand extends Command {
             
         } else {
             urlChecker.verify(url, async () => {
-                await Moderation.addEvidence(logId, url)
-                    .then(() => { return msg.react('\u2705') })
+                await Moderation.addEvidence(logId, 'DISCORD', url)
+                    .then(() => { return msg.react('✅') })
                     .catch(err => { Logger.error(err) })
             })
         }

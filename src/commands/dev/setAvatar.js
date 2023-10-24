@@ -6,7 +6,7 @@ module.exports = class SetAvatarCommand extends Command {
             name: 'setavatar',
             aliases: ['setavatar'],
             group: 'dev',
-            memberName: 'setavatar',
+            memberName: 'set_avatar',
             description: 'Says something.',
             guildOnly: false,
             throttling: {
@@ -29,7 +29,7 @@ module.exports = class SetAvatarCommand extends Command {
 
     async run(msg, { imgURL }) {
         msg.author.client.user.setAvatar(imgURL)
-            .then(() => msg.react('\u2705'))
+            .then(() => msg.react('✅'))
             .catch(Logger.error)
     }
 }
